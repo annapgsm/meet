@@ -11,7 +11,6 @@
 
 
     <body>
-        <h1>Page loaded</h1>
         <style>
             #container {
             max-width: 500px;
@@ -58,17 +57,17 @@
             const getAuthURL = "https://endpyosejh.execute-api.eu-central-1.amazonaws.com/dev/api/get-auth-url";
 
             getAuthUrlButton.onclick = function () {
-            fetch(getAuthURL)
+                fetch(getAuthURL)
                 .then(function (response) {
-                return response.json();
+                    return response.json();
                 })
                 .then(function (json) {
-                const result = JSON.stringify(json);
-                // we get the value of authUrl
-                const { authUrl } = JSON.parse(result);
-                // then add it to the html
-                resultElement.innerText = result;
-                resultLink.href = authUrl;
+                    const result = JSON.stringify(json);
+                    // we get the value of authUrl
+                    const { authUrl } = JSON.parse(result);
+                    // then add it to the html
+                    resultElement.innerText = result;
+                    resultLink.href = authUrl; //not authURL?
                 });
             };
 
@@ -79,20 +78,20 @@
             const getToken = "https://endpyosejh.execute-api.eu-central-1.amazonaws.com/dev/api/token";
 
             getAccessToken.onclick = function () {
-            let code = codeValue.value;
+                let code = codeValue.value;
 
 
-            // if the authorization code is not URL-encoded, then URL-encode it.
-            if (decodeURIComponent(code) === code) {
-                code = encodeURIComponent(codeValue.value);
-            }
-            const getTokenRequest = getToken +  "/" + code;
-            fetch(getTokenRequest)
+                // if the authorization code is not URL-encoded, then URL-encode it.
+                if (decodeURIComponent(code) === code) {
+                    code = encodeURIComponent(codeValue.value);
+                }
+                const getTokenRequest = getToken +  "/" + code;
+                fetch(getTokenRequest)
                 .then(function (response) {
-                return response.json();
+                    return response.json();
                 })
                 .then(function (json) {
-                accessTokenElement.innerText = JSON.stringify(json);
+                    accessTokenElement.innerText = JSON.stringify(json);
                 });
             };
 
