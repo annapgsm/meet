@@ -19,4 +19,11 @@ describe('<App /> component', () => {
     expect(AppDOM.querySelector('#city-search')).toBeInTheDocument();
   }); 
 
+  test("renders NumberOfEvents component", () => {
+    const AppComponent = render(<App />);
+    const numberOfEvents = AppComponent.container.firstChild.querySelector("#number-of-events");
+    expect(numberOfEvents).toBeInTheDocument();
+  });
+
+
 });
