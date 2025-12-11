@@ -1,42 +1,217 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+@import url(https://fonts.googleapis.com/css?family=Roboto:500);
+
+/* ================================
+   THEME VARIABLES
+   ================================ */
+
+:root {
+  /* LIGHT THEME DEFAULT */
+  --color-bg: #ffffff;
+  --color-text: #222222;
+  --color-heading: #000000;
+
+  --color-input-bg: #ffffff;
+  --color-input-border: #cccccc;
+  --color-input-text: #222222;
+
+  --color-suggestion-bg: #e6e6e6;
+  --color-suggestion-hover: #d8f3f2;
+  --color-suggestion-text: #000000;
+  --color-suggestion-shadow: rgba(0, 0, 0, 0.75);
+
+  --color-event-bg: #ffffff;
+  --color-event-border: #cccccc;
+  --color-event-text: #222222;
+
+  --color-details-text: #222222;
+  --color-details-bg: transparent;
+
+  --color-button-bg: #e0e0e0;
+  --color-button-text: #000000;
+
+  --transition-speed: 0.3s;
+}
+
+/* DARK MODE OVERRIDE */
+.App.dark {
+  --color-bg: #1a1a1a;
+  --color-text: #eeeeee;
+  --color-heading: whitesmoke;
+
+  --color-input-bg: #333333;
+  --color-input-border: #555555;
+  --color-input-text: #ffffff;
+
+  --color-suggestion-bg: darkgray;
+  --color-suggestion-hover: #bcdcdb;
+  --color-suggestion-text: #000000;
+
+  --color-event-bg: #2a2a2a;
+  --color-event-border: #555555;
+  --color-event-text: #eeeeee;
+
+  --color-details-text: #ffffff;
+
+  --color-button-bg: #444444;
+  --color-button-text: #ffffff;
+}
+
+/* ================================
+   BASE APP STYLES
+   ================================ */
+
+.App {
   text-align: center;
+  padding: 2% 5%;
+  margin: 10px auto;
+  background-color: var(--color-bg);
+  color: var(--color-text);
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.App * {
+  box-sizing: border-box;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.App h1 {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 200;
+  margin-bottom: 40px;
+  color: var(--color-heading);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+ul {
+  padding: 0;
+  list-style: none;
 }
 
-.card {
-  padding: 2em;
+p {
+  margin: 5px 0;
 }
 
-.read-the-docs {
-  color: #888;
+/* ================================
+   LIGHT/ DARK MODE
+   ================================ */
+
+
+#theme-toggle {
+  margin-bottom: 30px; 
+}
+
+
+/* ================================
+   INPUTS
+   ================================ */
+
+input[type="text"],
+input[type="number"] {
+  padding: 8px 6px 8px 10px;
+  border-radius: 4px;
+  outline: none;
+  border: 1px solid var(--color-input-border);
+  font-size: 14px;
+  line-height: 20px;
+  align-self: center;
+  height: 38px;
+  margin-bottom: 20px;
+  background-color: var(--color-input-bg);
+  color: var(--color-input-text);
+}
+
+.city {
+  width: 250px;
+}
+
+/* ================================
+   CITY SEARCH DROPDOWN
+   ================================ */
+
+#city-search {
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  position: relative;
+}
+
+.suggestions {
+  width: 250px;
+  position: absolute;
+  top: 45px;
+  z-index: 2;
+  align-self: center;
+  margin: 0;
+  font-size: 14px;
+  box-shadow: 10px 10px 16px -12px var(--color-suggestion-shadow);
+}
+
+.suggestions > li {
+  color: var(--color-suggestion-text);
+  text-align: left;
+  padding: 8px 6px 8px 10px;
+  background-color: var(--color-suggestion-bg);
+  cursor: default;
+}
+
+.suggestions > li:last-child {
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+.suggestions > li:hover {
+  background-color: var(--color-suggestion-hover);
+}
+
+/* ================================
+   EVENT BOX
+   ================================ */
+
+.event {
+  width: 70%;
+  padding: 10px 10px 35px;
+  margin: 0 auto 10px auto;
+  text-align: left;
+  border: 1px solid var(--color-event-border);
+  border-radius: 4px;
+  position: relative;
+  background-color: var(--color-event-bg);
+  color: var(--color-event-text);
+
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+}
+
+/* ================================
+   DETAILS BUTTON
+   ================================ */
+
+.details-btn {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  padding: 5px 8px;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  background-color: var(--color-button-bg);
+  color: var(--color-button-text);
+  border: none;
+}
+
+/* ================================
+   DETAILS SHOW / HIDE
+   ================================ */
+
+.details {
+  overflow: hidden;
+  transition: max-height var(--transition-speed) ease,
+              opacity var(--transition-speed) ease;
+  max-height: 0;
+  opacity: 0;
+  visibility: hidden;
+  color: var(--color-details-text);
+}
+
+.details.open {
+  max-height: 500px; /* large enough */
+  opacity: 1;
+  visibility: visible;
 }

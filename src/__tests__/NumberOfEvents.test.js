@@ -1,12 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import NumberOfEvents from "../components/NumberOfEvents";
 
 describe("<NumberOfEvents /> component", () => {
+  
+  function Wrapper() {
+    const [currentNOE, setCurrentNOE] = useState(32);
+    return (
+      <NumberOfEvents
+        currentNOE={currentNOE}
+        setCurrentNOE={setCurrentNOE}
+      />
+    );
+  }
+
   beforeEach(() => {
-    render(<NumberOfEvents />);
+    render(
+      <Wrapper />
+    );
   });
 
   test("renders a spinbutton input", () => {

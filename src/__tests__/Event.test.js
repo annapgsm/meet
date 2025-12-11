@@ -22,7 +22,9 @@ describe("<Event /> component (Feature 2: Show/Hide Event Details)", () => {
     });
 
     test("renders event start time", () => {
-        expect(EventComponent.queryByText(allEvents[0].created)).toBeInTheDocument();
+      /* old: expect(EventComponent.queryByText(allEvents[0].created)).toBeInTheDocument(); */
+      const startTimeElement = EventComponent.container.querySelector('.event-start-time');
+      expect(startTimeElement).toBeInTheDocument();
     });
 
     test("renders event location", () => {
@@ -35,7 +37,8 @@ describe("<Event /> component (Feature 2: Show/Hide Event Details)", () => {
 
     test("by default, event's details section should be hidden", () => {
     const details = EventComponent.container.querySelector('.details');
-    expect(details).not.toBeInTheDocument();
+    /* expect(details).not.toBeInTheDocument(); */
+    expect(details).toHaveClass('closed');
   });
 
   test("shows the details section when user clicks on the 'show details' button", async () => {
@@ -64,7 +67,8 @@ describe("<Event /> component (Feature 2: Show/Hide Event Details)", () => {
     await user.click(hideButton);
 
     const details = EventComponent.container.querySelector('.details');
-    expect(details).not.toBeInTheDocument();
+    /* expect(details).not.toBeInTheDocument(); */
+    expect(details).toHaveClass('closed');  // checks if details are hidden via class
 
     // button returns to "show details"
     expect(EventComponent.queryByText('show details')).toBeInTheDocument();

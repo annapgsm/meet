@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import { render, within } from '@testing-library/react';
+import { render, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import App from '../App';
@@ -56,5 +56,31 @@ describe('<App /> integration', () => {
 
 
     expect(allRenderedEventItems.length).toBe(berlinEvents.length);
+  });
+
+  test('changes the number of events displayed when the user changes the number input', async () => {
+    const user = userEvent.setup();
+    const AppComponent = render(<App />);
+    const AppDOM = AppComponent.container.firstChild;
+
+    // Find the NumberOfEvents component container by id or class
+    const NumberOfEventsDOM = AppDOM.querySelector('#number-of-events');
+    // Find the input inside NumberOfEvents
+    const NumberOfEventsInput = within(NumberOfEventsDOM).queryByRole('spinbutton'); 
+
+    await user.clear(NumberOfEventsInput);
+
+    /* Clear the default value (e.g. '32') by simulating backspaces, then type '10'
+    await user.type(NumberOfEventsInput, '{backspace}{backspace}10'); */
+    await user.type(NumberOfEventsInput, '10');
+
+    // Now wait for EventList to update
+    const EventListDOM = AppDOM.querySelector('#event-list');
+
+    await waitFor(() => {
+      // Query all list items representing events
+      const eventItems = within(EventListDOM).queryAllByRole('listitem');
+      expect(eventItems.length).toBe(10);
+    });
   });
 });
