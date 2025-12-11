@@ -37,7 +37,7 @@ export const getEvents = async () => {
 
     if (token) {
     removeQuery(); //will remove the code from the URL once you’re finished with it
-    const url =  "YOUR_GET_EVENTS_API_ENDPOINT" + "/" + token;
+    const url =  "https://endpyosejh.execute-api.eu-central-1.amazonaws.com/dev/api/get-events" + "/" + token;
     const response = await fetch(url);
     const result = await response.json();
     if (result) {
@@ -58,7 +58,7 @@ export const getAccessToken = async () => {
         const code = await searchParams.get("code");
     if (!code) {
         const response = await fetch(
-        "YOUR_SERVERLESS_GET_AUTH_URL_ENDPOINT"
+        "https://endpyosejh.execute-api.eu-central-1.amazonaws.com/dev/api/get-auth-url"
         );
         const result = await response.json();
         const { authUrl } = result;
@@ -87,7 +87,7 @@ const removeQuery = () => {
 const getToken = async (code) => {
     const encodeCode = encodeURIComponent(code);
     const response = await fetch(
-    'YOUR_GET_ACCESS_TOKEN_ENDPOINT' + '/' + encodeCode
+    'https://endpyosejh.execute-api.eu-central-1.amazonaws.com/dev/api/token' + '/' + encodeCode
     );
     const { access_token } = await response.json();
     access_token && localStorage.setItem("access_token", access_token);
