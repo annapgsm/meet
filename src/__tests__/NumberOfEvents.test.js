@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import NumberOfEvents from "../components/NumberOfEvents";
+import App from "../App"
 
 describe("<NumberOfEvents /> component", () => {
   
@@ -40,5 +41,16 @@ describe("<NumberOfEvents /> component", () => {
     await user.type(input, "10");
 
     expect(input).toHaveValue(10);
+  });
+});
+
+describe("<NumberOfEvents /> integration", () => {
+  test("NumberOfEvents is rendered when the App is mounted", () => {
+    const AppComponent = render(<App />);
+    const AppDOM = AppComponent.container.firstChild;
+
+    const NumberOfEventsDOM = AppDOM.querySelector('#number-of-events');
+
+    expect(NumberOfEventsDOM).toBeInTheDocument();
   });
 });
