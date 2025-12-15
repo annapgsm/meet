@@ -15,7 +15,6 @@ describe('<EventList /> component', () => {
   test('has an element with "list" role', () => {
     expect(EventListComponent.queryByRole("list")).toBeInTheDocument();
   });
-
   
   /*
 
