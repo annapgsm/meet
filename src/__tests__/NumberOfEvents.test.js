@@ -8,11 +8,13 @@ import App from "../App"
 describe("<NumberOfEvents /> component", () => {
   
   function Wrapper() {
+    const setErrorAlert = jest.fn();  
     const [currentNOE, setCurrentNOE] = useState(32);
     return (
       <NumberOfEvents
         currentNOE={currentNOE}
         setCurrentNOE={setCurrentNOE}
+        setErrorAlert={setErrorAlert}
       />
     );
   }
@@ -37,8 +39,10 @@ describe("<NumberOfEvents /> component", () => {
     const user = userEvent.setup();
     const input = screen.getByRole("spinbutton", { name: /number of events/i });
 
-    await user.clear(input);
-    await user.type(input, "10");
+    await user.click(input);
+    await user.keyboard('{Control>}a{/Control}');  // select all (Cmd on Mac, Ctrl on Windows)
+    await user.keyboard('{Backspace}');            // delete selection
+    await user.type(input, '10');                   // type 10
 
     expect(input).toHaveValue(10);
   });

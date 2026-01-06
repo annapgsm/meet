@@ -68,7 +68,7 @@ describe('<App /> integration', () => {
     // Find the input inside NumberOfEvents
     const NumberOfEventsInput = within(NumberOfEventsDOM).queryByRole('spinbutton'); 
 
-    await user.clear(NumberOfEventsInput);
+    await user.type(NumberOfEventsInput, '{backspace}{backspace}');
 
     /* Clear the default value (e.g. '32') by simulating backspaces, then type '10'
     await user.type(NumberOfEventsInput, '{backspace}{backspace}10'); */

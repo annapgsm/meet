@@ -1,9 +1,19 @@
 import React from "react";
 
-function NumberOfEvents({ currentNOE, setCurrentNOE }) {
+function NumberOfEvents({ currentNOE, setCurrentNOE, setErrorAlert }) {
+
   const handleInputChanged = (e) => {
-    const value = Number(e.target.value);
-    setCurrentNOE(value);
+    const value = parseInt(e.target.value,10);
+
+    if (isNaN(value)) {
+      setErrorAlert("Please enter a valid number");
+    } if (value < 1 || value > 32){
+      setErrorAlert("Number must be between 1 and 32");
+      return;
+    } else {
+      setErrorAlert("");
+      setCurrentNOE(value);
+    }
   };
 
   return (
