@@ -47,7 +47,7 @@ const App = () => {
       setWarningAlert("You are currently offline. The displayed list may not be up to date.");
     }
 
-    fetchData(currentCity, currentNOE);
+    fetchData(currentNOE, currentCity);
   }, [currentCity, currentNOE]);
 
 
