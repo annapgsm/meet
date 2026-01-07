@@ -3,17 +3,29 @@ import React from "react";
 function NumberOfEvents({ currentNOE, setCurrentNOE, setErrorAlert }) {
 
   const handleInputChanged = (e) => {
-    const value = parseInt(e.target.value,10);
+    const inputValue = e.target.value;
+
+    // Allow empty string input — clear state and error
+    if (inputValue === "") {
+      setCurrentNOE("");
+      setErrorAlert("");
+      return;
+    }
+
+    const value = parseInt(inputValue, 10);
 
     if (isNaN(value)) {
       setErrorAlert("Please enter a valid number");
-    } if (value < 1 || value > 32){
+      return;
+    }
+
+    if (value < 1 || value > 32) {
       setErrorAlert("Number must be between 1 and 32");
       return;
-    } else {
-      setErrorAlert("");
-      setCurrentNOE(value);
     }
+
+    setErrorAlert("");
+    setCurrentNOE(value);
   };
 
   return (
@@ -21,7 +33,7 @@ function NumberOfEvents({ currentNOE, setCurrentNOE, setErrorAlert }) {
       <input
         type="number"
         aria-label="number of events"
-        value={currentNOE}
+        value={currentNOE === "" ? "" : currentNOE}
         onChange={handleInputChanged}
         min={1}
         max={32}
