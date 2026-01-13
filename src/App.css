@@ -4,8 +4,9 @@
    THEME VARIABLES
    ================================ */
 
+
+  /* LIGHT THEME DEFAULT 
 :root {
-  /* LIGHT THEME DEFAULT */
   --color-bg: #ffffff;
   --color-text: #222222;
   --color-heading: #000000;
@@ -30,9 +31,34 @@
   --color-button-text: #000000;
 
   --transition-speed: 0.3s;
+} */
+
+:root {
+  --color-bg: #E6E8E6;
+  --color-text: #3F403F;
+  --color-heading: #3F403F;
+
+  --color-input-bg: #ffffff;
+  --color-input-border: #9FB8AD;
+  --color-input-text: #3F403F;
+
+  --color-suggestion-bg: #CED0CE;
+  --color-suggestion-hover: #9FB8AD;
+  --color-suggestion-text: #3F403F;
+  --color-suggestion-shadow: rgba(0, 0, 0, 0.2);
+
+  --color-event-bg: #ffffff;
+  --color-event-border: #9FB8AD;
+  --color-event-text: #3F403F;
+
+  --color-details-text: #3F403F;
+
+  --color-button-bg: #9FB8AD;
+  --color-button-text: #ffffff;
 }
 
-/* DARK MODE OVERRIDE */
+
+/* DARK MODE OVERRIDE  */
 .App.dark {
   --color-bg: #1a1a1a;
   --color-text: #eeeeee;
@@ -54,18 +80,20 @@
 
   --color-button-bg: #444444;
   --color-button-text: #ffffff;
-}
+} 
 
 /* ================================
    BASE APP STYLES
    ================================ */
 
 .App {
-  text-align: center;
-  padding: 2% 5%;
-  margin: 10px auto;
+  min-width: 320px;
+  width: 100vw;
+  max-width: 100%;
+  min-height: 100vh;
   background-color: var(--color-bg);
   color: var(--color-text);
+  margin: 0 auto; 
 }
 
 .App * {
@@ -74,10 +102,13 @@
 
 .App h1 {
   font-family: 'Roboto', sans-serif;
-  font-weight: 200;
-  margin-bottom: 40px;
+  font-weight: 700; /* heavier for navbar title */
+  margin: 0;        /* remove bottom margin since header spacing handles it */
+  font-size: 1.8rem;
   color: var(--color-heading);
+  user-select: none;
 }
+
 
 ul {
   padding: 0;
@@ -87,6 +118,49 @@ ul {
 p {
   margin: 5px 0;
 }
+/* ================================
+   NAVBAR STYLE (App Header)
+   ================================ */
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 32px;
+  background-color: var(--color-bg);
+  border-bottom: 1px solid var(--color-input-border);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.app-header h1 {
+  font-size: 1.8rem;
+  color: var(--color-heading);
+  font-weight: 700;
+  user-select: none;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: nowrap;
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 16px 20px;
+  }
+
+  .controls {
+    justify-content: space-between;
+  }
+}
 
 /* ================================
    LIGHT/ DARK MODE
@@ -94,13 +168,14 @@ p {
 
 
 #theme-toggle {
-  margin-bottom: 30px; 
+  margin-bottom: 10px; 
+  height: 38px;
 }
 
 
 /* ================================
    INPUTS
-   ================================ */
+   ================================ 
 
 input[type="text"],
 input[type="number"] {
@@ -120,7 +195,24 @@ input[type="number"] {
 .city {
   width: 250px;
 }
+*/
 
+input[type="text"],
+input[type="number"] {
+  height: 38px;
+  line-height: 38px;
+  padding: 0 10px;
+  box-sizing: border-box;
+  font-size: 14px;
+  border-radius: 3px;
+  border: 1px solid var(--color-input-border);
+  background-color: var(--color-input-bg);
+}
+
+input[type="number"] {
+  width: 180px;               /* specific width for number input */
+  color: var(--color-input-text); /* color override */
+}
 /* ================================
    CITY SEARCH DROPDOWN
    ================================ */
@@ -163,18 +255,26 @@ input[type="number"] {
 /* ================================
    EVENT BOX
    ================================ */
+#event-list {
+  width: 70%;          /* same width as charts-section for alignment */
+  margin: 0 auto;      /* center horizontally */
+  min-height: 400px;   /* reserve vertical space even if no events */
+  padding: 0;          /* remove default ul padding */
+  box-sizing: border-box;
+  list-style: none;    /* remove bullets */
+}
 
 .event {
-  width: 70%;
+  width: 100%;
   padding: 10px 10px 35px;
   margin: 0 auto 10px auto;
   text-align: left;
-  border: 1px solid var(--color-event-border);
-  border-radius: 4px;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06); /* subtle shadow */
   position: relative;
   background-color: var(--color-event-bg);
   color: var(--color-event-text);
-
   box-sizing: border-box;
   overflow-wrap: break-word;
 }
@@ -226,4 +326,93 @@ input[type="number"] {
  left: 20px;
  width: 250px;
  z-index: 1000;
+}
+
+/* ================================
+   CHARTS
+   ================================ */
+
+.charts-section {
+  width: 70%;          
+  margin: 20px auto 20px; 
+}
+
+.charts-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .charts-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-card {
+  background: #fff;               /* white background */
+  border-radius: 12px;           /* rounded corners */
+  padding: 20px;                 /* spacing inside the card */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06); /* subtle shadow */
+  display: flex;
+  flex-direction: column;        /* stack title, chart, legend vertically */
+  align-items: center;           /* center children horizontally */
+  max-width: 520px;      /* limits how wide the chart can become */
+  width: 100%;          /* allows shrinking on small screens */}
+
+.App.dark .chart-card {
+  background: #3f403f;           /* dark mode card bg */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);  /* stronger shadow in dark mode */
+}
+
+.chart-title {
+  font-size: 1.3rem;             /* slightly larger text */
+  font-weight: 700;              /* bold font */
+  margin-bottom: 16px;           /* space below title */
+  color: var(--color-heading);   /* theme-aware text color */
+  user-select: none;             /* prevent text selection */
+  text-align: center;            /* center text */
+  width: 100%;                   /* full width for alignment */
+}
+
+/* Legend styling */
+.recharts-legend-wrapper {
+  margin-top: 50px;              /* space above legend */
+  font-weight: 600;              /* slightly bold */
+  font-size: 0.9rem;             /* smaller text */
+  color: var(--color-text);      /* theme text color */
+  text-align: center;            /* center legend text */
+  width: 100%;                   /* full width */
+  user-select: none;             /* no selection */
+}
+
+.recharts-legend-item {
+  margin-right: 25px;            /* space between legend items */
+  cursor: default;               /* no pointer on hover */
+  display: inline-flex;          /* inline with flex for alignment */
+  align-items: center;           /* vertical align color box and text */
+  gap: 6px;                     /* small gap between box and text */
+}
+
+.recharts-legend-item rect {
+  width: 14px !important;        /* size of color box */
+  height: 14px !important;
+  border-radius: 3px;            /* rounded corners on color box */
+  stroke: #ccc;                  /* subtle border on color box */
+  stroke-width: 1px;
+}
+
+
+@media (max-width: 768px) {
+  .controls {
+    flex-direction: column; /* stack inputs vertically */
+    gap: 12px;              /* spacing between inputs */
+    justify-content: stretch; /* stretch inputs full width */
+    width: 100%;            /* full width container */
+  }
+
+  .controls > * {
+    width: 100%;            /* each child takes full width */
+    max-width: none;        /* remove any max-width constraints */
+  }
 }

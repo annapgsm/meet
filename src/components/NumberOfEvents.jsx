@@ -33,6 +33,7 @@ function NumberOfEvents({ currentNOE, setCurrentNOE, setErrorAlert }) {
       <input
         type="number"
         aria-label="number of events"
+        placeholder="Number of events"
         value={currentNOE === "" ? "" : currentNOE}
         onChange={handleInputChanged}
         min={1}

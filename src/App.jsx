@@ -4,6 +4,7 @@ import CitySearch from './components/CitySearch';
 import EventList from './components/EventList';
 import NumberOfEvents from './components/NumberOfEvents';
 import CityEventsChart from './components/CityEventsChart';
+import EventGenresChart from './components/EventGenresChart';
 import ThemeToggle from "./components/ThemeToggle";
 import { getEvents, extractLocations  } from './api';
 import { InfoAlert, ErrorAlert, WarningAlert } from './components/Alert';
@@ -67,20 +68,41 @@ const App = () => {
 
   return (
     <div className={`App ${theme}`}>
+      <header className="app-header">
         <h1>City Events Explorer</h1>
-        {/* Theme toggle placed top-level */}
-        <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
-        <div className="alerts-container">
-          {infoAlert.length ? <InfoAlert text={infoAlert}/> : null}
-          {errorAlert.length ? <ErrorAlert text={errorAlert}/> : null}
-          {warningAlert.length ? <WarningAlert text={warningAlert}/> : null}
+        <div className="controls">
+          <CitySearch 
+            allLocations={allLocations} 
+            setCurrentCity={setCurrentCity} 
+            setInfoAlert={setInfoAlert} 
+            setErrorAlert={setErrorAlert} 
+          />
+
+          <NumberOfEvents 
+            currentNOE={currentNOE} 
+            setCurrentNOE={setCurrentNOE} 
+            setErrorAlert={setErrorAlert} 
+          />
+
+          <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
         </div>
-        <CitySearch allLocations={allLocations} setCurrentCity={setCurrentCity} setInfoAlert={setInfoAlert} setErrorAlert={setErrorAlert} />
-        <NumberOfEvents currentNOE={currentNOE} setCurrentNOE={setCurrentNOE} setErrorAlert={setErrorAlert} />
+      </header>
+
+      <div className="alerts-container">
+        {infoAlert.length ? <InfoAlert text={infoAlert}/> : null}
+        {errorAlert.length ? <ErrorAlert text={errorAlert}/> : null}
+        {warningAlert.length ? <WarningAlert text={warningAlert}/> : null}
+      </div>
+      <section className="charts-section">
         <div className="charts-container">
+          <EventGenresChart events={events} />
           <CityEventsChart allLocations={allLocations} events={events} />
         </div>
+      </section>
+
+      <section className="events-section">
         <EventList events={events} />
+      </section>
     </div>
   );
 }
