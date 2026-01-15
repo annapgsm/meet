@@ -172,47 +172,43 @@ p {
   height: 38px;
 }
 
-
 /* ================================
-   INPUTS
-   ================================ 
+   INPUT FIELDS 
+   ================================ */
 
 input[type="text"],
 input[type="number"] {
-  padding: 8px 6px 8px 10px;
-  border-radius: 4px;
-  outline: none;
+  height: 42px;
+  padding: 0 14px;
+  font-size: 0.95rem;
+  border-radius: 10px;
   border: 1px solid var(--color-input-border);
-  font-size: 14px;
-  line-height: 20px;
-  align-self: center;
-  height: 38px;
-  margin-bottom: 20px;
   background-color: var(--color-input-bg);
   color: var(--color-input-text);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  transition: all 0.2s ease;
 }
 
-.city {
-  width: 250px;
+/* Focus & Hover feedback */
+input[type="text"]:hover,
+input[type="number"]:hover,
+input[type="text"]:focus,
+input[type="number"]:focus {
+  border-color: #9FB8AD;
+  outline: none;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
 }
-*/
 
-input[type="text"],
+/* Placeholder */
+input::placeholder {
+  color: #888;
+}
+
+/* Specific width for number input */
 input[type="number"] {
-  height: 38px;
-  line-height: 38px;
-  padding: 0 10px;
-  box-sizing: border-box;
-  font-size: 14px;
-  border-radius: 3px;
-  border: 1px solid var(--color-input-border);
-  background-color: var(--color-input-bg);
+  width: 180px;
 }
 
-input[type="number"] {
-  width: 180px;               /* specific width for number input */
-  color: var(--color-input-text); /* color override */
-}
 /* ================================
    CITY SEARCH DROPDOWN
    ================================ */
@@ -280,26 +276,9 @@ input[type="number"] {
 }
 
 /* ================================
-   DETAILS BUTTON
+    DETAILS
    ================================ */
-
-.details-btn {
-  position: absolute;
-  right: 5px;
-  bottom: 5px;
-  padding: 5px 8px;
-  border-radius: 4px;
-  outline: none;
-  cursor: pointer;
-  background-color: var(--color-button-bg);
-  color: var(--color-button-text);
-  border: none;
-}
-
-/* ================================
-   DETAILS SHOW / HIDE
-   ================================ */
-
+   
 .details {
   overflow: hidden;
   transition: max-height var(--transition-speed) ease,
@@ -314,6 +293,46 @@ input[type="number"] {
   max-height: 500px; /* large enough */
   opacity: 1;
   visibility: visible;
+}
+
+/* ================================
+   EVENT BUTTONS
+   ================================ */
+
+.event-actions {
+  display: flex;
+  align-items: center;          /* keeps everything on one line */
+  justify-content: space-between; /* details left, calendar right */
+  margin-top: 12px;
+}
+
+.calendar-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* shared style for all event action buttons */
+.event-btn {
+  padding: 5px 10px;                       /* comfortable click area */
+  border-radius: 6px;                      /* soft modern corners */
+  border: none;                            /* no default border */
+  cursor: pointer;                         /* show it's clickable */
+  font-size: 0.85rem;                      /* compact text */
+  background-color: var(--color-button-bg);
+  color: var(--color-button-text);
+  display: inline-flex;                    /* align icon/text nicely */
+  align-items: center;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, /* smooth hover */
+              transform 0.2s ease,
+              box-shadow 0.2s ease;
+}
+
+/* unified hover effect */
+.event-btn:hover {
+  background-color: #9FB8AD;               /* your green */
+  transform: translateY(-1px);             /* subtle lift */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
 /* ================================
@@ -416,3 +435,4 @@ input[type="number"] {
     max-width: none;        /* remove any max-width constraints */
   }
 }
+
