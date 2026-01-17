@@ -1,36 +1,49 @@
 
 # Meet App
 
-**Meet App** is a serverless, progressive web application (PWA) built with **React** using **Vite**.  
+**Meet App** is a serverless, progressive web application (PWA) built with **React and Vite**, that allows users to discover and explore upcoming events across different cities.
 
-Users can browse and filter upcoming events across different cities, view event details, and interact with data visualizations — all while supporting offline access and home screen installation.
+The app integrates with the Google Calendar API, supports offline usage, can be installed on desktop and mobile devices and includes data visualizations to help users better understand event distribution.
 
 
 ## Overview 
 
-...
+Users can search for events by city, control how many events are displayed, view detailed event information, and explore visual insights through charts.
+
+The application follows Test-Driven Development (TDD) principles and uses a serverless backend to handle authentication securely.
+
 ## Tech Stack
 | Category | Technologies |
 |-----------|---------------|
 | **Frontend** | React (Vite + SWC), JavaScript, HTML, CSS |
 | **Testing** | Jest, Cucumber, Puppeteer |
-| **Deployment** | GitHub Pages / Netlify |
-| **Data Source** | Google Calendar API |
+| **Backend** | AWS Lambda (Serverless Functions) |
+| **API** | Google Calendar API |
+| **Authentication** | OAuth2 |
+| **Data Visualization** | Recharts |
+| **PWA** | Service Workers |
+| **Deployment** | Vercel, GitHub Pages |
 | **Build Tools** | Vite, npm |
-| **Other** | Service Workers, AWS Lambda (serverless backend) |
 
 
-## Features
-- **Event Browsing:** View a list of upcoming events from various cities.
-- **City Search:** Filter events by city with live suggestions.
-- **Event Details:** Expand or collapse event information.
-- **Customizable Event Count:** Set how many events to display at once.
-- **Offline Use:** Save events locally and view them without internet access.
-- **PWA Support:** Install the app directly on your device home screen.
-- **Data Visualization:** View charts that show event distribution by city.
-## Set up instructions
+## Key Features
 
-Follow these steps to get the Meet App running locally on your machine:
+- Search for events by city with live suggestions
+- View a list of upcoming events
+- Expand and collapse event details
+- Specify the number of events displayed
+- Use the app offline with cached data
+- Install the app as a PWA on desktop or mobile
+- Visualize event data with interactive charts
+
+## Bonus Features
+- Open event directly in Google Calendar or add it to a personal calendar
+- Switch between light and dark themes based on preference or environment.
+
+
+## Installation & Setup
+
+Follow these steps to run the app locally:
 
 ### Steps
 1. **Clone the repository**  
@@ -63,9 +76,65 @@ https://meet-ten-alpha.vercel.app/
 
 To deploy your own version:
 
-- Create a [Vercel](https://vercel.com/) account.
-- Import the project repository into Vercel and follow the prompts to deploy the app.
-- Your app will be live at the provided Vercel URL.
+1. Create a [Vercel](https://vercel.com/) account.
+2. Import the project repository into Vercel and follow the prompts to deploy the app.
+3. Your app will be live at the provided Vercel URL.
+
+
+## Test-Driven Development (TDD)
+
+The Meet App was built using strict TDD practices: 
+- Write failing tests
+- Implement minimal code to pass
+- Refactor
+- Repeat
+
+### Testing tools used:
+
+- Jest
+- Cucumber (BDD scenarios)
+- Puppeteer (end-to-end testing)
+
+## Progressive Web App (PWA)
+
+- Offline support via service workers
+- Installable on desktop and mobile
+- Optimized for performance and accessibility
+- Meets Lighthouse PWA standards
+
+## Serverless Backend (AWS Lambda)
+
+The Meet App uses a serverless backend built with AWS Lambda to securely handle authentication with the Google Calendar API.
+
+To protect sensitive credentials and avoid exposing them on the client, authentication is managed via two Lambda functions:
+
+### Lambda Functions
+
+**getAuthURL**
+Generates a Google OAuth authorization URL that allows users to sign in securely.
+
+**getAccessToken**
+Exchanges the authorization code for an access token used to access the Google Calendar API.
+
+### API Endpoints
+
+```bash
+GET /api/get-auth-url
+```
+
+Returns the Google OAuth authorization URL.
+
+```bash
+GET /api/token/{code} 
+```
+Exchanges the authorization code for an access token.
+
+This architecture ensures:
+
+- Secure handling of OAuth credentials
+- No sensitive data exposed on the frontend
+- Scalable, maintenance-free backend infrastructure
+
 ## User Stories
 
 ### Feature 1: Filter Events by City

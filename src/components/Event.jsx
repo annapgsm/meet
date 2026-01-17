@@ -50,7 +50,7 @@ function Event({ event }) {
       </div>
       <div className="event-actions">
         <button
-          className="event-btn"
+          className="event-btn detail-btn"
           onClick={() => setShowDetails(!showDetails)}
         >
           {showDetails ? "hide details" : "show details"}
@@ -60,15 +60,15 @@ function Event({ event }) {
             href={openCalendarAtEventTime()}
             target="_blank"
             rel="noopener noreferrer"
-            className="event-btn secondary"
+            className="event-btn calendar-btn"
           >
-            Open Google Calendar
+            Open in Google Calendar
           </a>
           <a
             href={createGoogleCalendarLink()}
             target="_blank"
             rel="noopener noreferrer"
-            className="event-btn"
+            className="event-btn calendar-btn"
           >
             Add to Google Calendar
           </a>
