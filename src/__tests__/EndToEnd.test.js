@@ -3,6 +3,7 @@
  */
 
 
+
 import puppeteer from 'puppeteer';
 
 jest.setTimeout(30000);
@@ -28,21 +29,31 @@ describe('show/hide an event details', () => {
   test('An event element is collapsed by default', async () => {
     await page.waitForSelector('.event');
 
-    const eventDetails = await page.$('.event .details');
-    const isVisible = await eventDetails?.isVisible();
+    const hasOpenClass = await page.$eval('.event .details', (el) =>
+      el.classList.contains('open')
+    );
 
-    expect(isVisible).toBe(false);
+    expect(hasOpenClass).toBe(false);
   });
 
   test('User can expand an event to see its details', async () => {
-    await page.waitForSelector('.event .details-btn');
-    await page.click('.event .details-btn');
+    await page.waitForSelector('.event');
+    await page.waitForSelector('.event .detail-btn');
 
-    const eventDetails = await page.$('.event .details');
-    const isVisible = await eventDetails.isVisible();
+    await page.click('.event .detail-btn');
 
-    expect(isVisible).toBe(true);
+    await page.waitForFunction(() => {
+      const el = document.querySelector('.event .details');
+      return el && el.classList.contains('open');
+    });
+
+    const hasOpenClass = await page.$eval('.event .details', (el) =>
+      el.classList.contains('open')
+    );
+
+    expect(hasOpenClass).toBe(true);
   });
+
 });
 
 describe('Filter events by city (Feature 1) - E2E tests', () => {
@@ -119,35 +130,32 @@ describe('Filter events by city (Feature 1) - E2E tests', () => {
 
 
 /*
+  describe('show/hide an event details', () => {
+    test('An event element is collapsed by default', async () => {
+      const browser = await puppeteer.launch();
+      const page = await browser.newPage();
 
-describe('show/hide an event details', () => {
-  test('An event element is collapsed by default', async () => {
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
+      await page.goto('http://localhost:5173/');
+      await page.waitForSelector('.event');
 
-    await page.goto('http://localhost:5173/');
-    await page.waitForSelector('.event');
+      const eventDetails = await page.$('.event .details');
+      const isVisible = await eventDetails.isVisible();
 
-    const eventDetails = await page.$('.event .details');
-    const isVisible = await eventDetails.isVisible();
+      expect(isVisible).toBe(false);
 
-    expect(isVisible).toBe(false);
+      await browser.close();
+    });
+    test('User can expand an event to see its details', async () => {
+      const browser = await puppeteer.launch();
+      const page = await browser.newPage();
+      await page.goto('http://localhost:5173/');
 
-    await browser.close();
-  });
-  test('User can expand an event to see its details', async () => {
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-    await page.goto('http://localhost:5173/');
+      await page.waitForSelector('.event');
+      await page.click('.event .details-btn');
 
-    await page.waitForSelector('.event');
-    await page.click('.event .details-btn');
-
-    const eventDetails = await page.$('.event .details');
-    expect(eventDetails).toBeDefined();
-    await browser.close();
-  });
-});
-
-
+      const eventDetails = await page.$('.event .details');
+      expect(eventDetails).toBeDefined();
+      await browser.close();
+    });
+  }); 
 */

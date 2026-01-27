@@ -10,38 +10,46 @@ import {
 const EventGenresChart = ({events}) =>{
 
     const [data, setData ] = useState([]);
+
     const genres = ['React', 'JavaScript', 'Node', 'jQuery', 'Angular'];
     const colors = ['#C7D9B7', '#CED0CE','#9FB8AD','#475841','#A6AEBF'];
+    
     useEffect(() => {
         setData(getData());
     }, [`${events}`])
 
     const getData = () => {
-        const data = genres.map(genre => {
-            const filteredEvents = events.filter(event => 
-                event.summary.includes(genre)
+        const chartData = genres
+        .map((genre) => {
+            const filteredEvents = events.filter((event) =>
+            event.summary.includes(genre)
             );
             return {
-                name: genre,
-                value: filteredEvents.length
+            name: genre,
+            value: filteredEvents.length,
             };
-        });
-        return data;
-    }
+        })
+        .filter((item) => item.value > 0); // ✅ remove zeros
+
+        return chartData;
+    };
+
 
     const renderCustomizedLabel = ({ cx, cy, midAngle, outerRadius, percent, index }) => {
         const RADIAN = Math.PI / 180;
         const radius = outerRadius;
-        const x = cx + radius * Math.cos(-midAngle * RADIAN) * 1.07;
-        const y = cy + radius * Math.sin(-midAngle * RADIAN) * 1.07;
+        const x = cx + radius * Math.cos(-midAngle * RADIAN) * 1.2;
+        const y = cy + radius * Math.sin(-midAngle * RADIAN) * 1.2;
 
         return percent ? (
             <text
             x={x}
             y={y}
-            fill="#87CBAC"
+            fill="#3F403F"
             textAnchor={x > cx ? 'start' : 'end'}
             dominantBaseline="central"
+            fontSize={12}
+            fontWeight={500}
             >
             {`${genres[index]} ${(percent * 100).toFixed(0)}%`}
             </text>
