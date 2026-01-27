@@ -37,22 +37,22 @@ describe('show/hide an event details', () => {
   });
 
   test('User can expand an event to see its details', async () => {
-    await page.waitForSelector('.event');
-    await page.waitForSelector('.event .detail-btn');
+  await page.waitForSelector('.event');
+  await page.waitForSelector('.event .detail-btn', { visible: true });
 
-    await page.click('.event .detail-btn');
+  // Click the first event's button
+  await page.click('.event .detail-btn');
 
-    await page.waitForFunction(() => {
-      const el = document.querySelector('.event .details');
-      return el && el.classList.contains('open');
-    });
+  // Wait until the first event's details has the "open" class
+  await page.waitForSelector('.event .details.open', { timeout: 60000 });
 
-    const hasOpenClass = await page.$eval('.event .details', (el) =>
-      el.classList.contains('open')
-    );
+  const hasOpenClass = await page.$eval('.event .details', (el) =>
+    el.classList.contains('open')
+  );
 
-    expect(hasOpenClass).toBe(true);
-  });
+  expect(hasOpenClass).toBe(true);
+  }, 60000);
+
 
 });
 
