@@ -1,6 +1,5 @@
 // src/api.js
 import NProgress from 'nprogress';
-
 import mockData from './mock-data';
 
 
@@ -28,34 +27,58 @@ const checkToken = async (accessToken) => {
 /**
  * This function will fetch the list of all events
  */
+
 export const getEvents = async () => {
-    // this is what allows you to run end-to-end tests using mock API data, instead of having to get real data
-    NProgress.start();
+  NProgress.start();
 
-    if (window.location.href.startsWith("http://localhost")) {
-        NProgress.done();
-        return mockData;
-    }
-    
-    if (!navigator.onLine) {
-        const events = localStorage.getItem("lastEvents");
-        NProgress.done();
-        return events?JSON.parse(events):[];
-    }
+  // Use mock data for local development
+  if (window.location.href.startsWith("http://localhost")) {
+    NProgress.done();
+    localStorage.setItem("lastEvents", JSON.stringify(mockData));
+    return Array.isArray(mockData) ? mockData : mockData.events || [];
+  }
 
+  // Offline fallback
+  if (!navigator.onLine) {
+    const events = localStorage.getItem("lastEvents");
+    NProgress.done();
+    return events ? JSON.parse(events) : (Array.isArray(mockData) ? mockData : mockData.events || []);
+  }
+
+  try {
     const token = await getAccessToken();
 
     if (token) {
-        removeQuery(); //will remove the code from the URL once you’re finished with it
-        const url =  "https://endpyosejh.execute-api.eu-central-1.amazonaws.com/dev/api/get-events" + "/" + token;
-        const response = await fetch(url);
-        const result = await response.json();
-        if (result) {
-            NProgress.done(); 
-            localStorage.setItem("lastEvents", JSON.stringify(result.events));
-            return result.events;
-        } else return null;
+      removeQuery();
+      const url =
+        "https://endpyosejh.execute-api.eu-central-1.amazonaws.com/dev/api/get-events/" + token;
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+
+      const result = await response.json();
+      const events = result?.events || [];
+
+      if (events.length > 0) {
+        localStorage.setItem("lastEvents", JSON.stringify(events));
+        NProgress.done();
+        return events;
+      }
+
+      throw new Error("No events returned from API");
     }
+
+    throw new Error("No access token available");
+  } catch (error) {
+    console.error("Falling back to mock data:", error);
+    const fallbackEvents = Array.isArray(mockData) ? mockData : mockData.events || [];
+    localStorage.setItem("lastEvents", JSON.stringify(fallbackEvents));
+    NProgress.done();
+    return fallbackEvents;
+  }
 };
 
 export const getAccessToken = async () => {
