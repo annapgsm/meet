@@ -6,10 +6,7 @@ provider:
   region: eu-central-1
   timeout: 30 
   environment:
-   CLIENT_ID: ${file(config.json):CLIENT_ID}
-   CLIENT_SECRET: ${file(config.json):CLIENT_SECRET}
-   CALENDAR_ID: ${file(config.json):CALENDAR_ID}
-
+  TICKETMASTER_API_KEY: ${file(config.json):TICKETMASTER_API_KEY}
 functions: 
   getAuthURL:
     handler: handler.getAuthURL
@@ -28,4 +25,10 @@ functions:
     events:
       - http:
           path: api/get-events/{access_token}
+          method: get
+    getEvents:
+    handler: handler.getEvents
+    events:
+      - http:
+          path: api/events
           method: get

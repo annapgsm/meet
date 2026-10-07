@@ -119,3 +119,46 @@ module.exports.getCalendarEvents = async (event)=> {
   });
 };
 
+module.exports.getEvents = async (event) => {
+  const city = event.queryStringParameters?.city || "Berlin";
+  const apiKey = process.env.TICKETMASTER_API_KEY;
+
+  const params = new URLSearchParams({
+    apikey: apiKey,
+    city: city,
+    size: "20",
+    sort: "date,asc",
+  });
+
+  const url = `https://app.ticketmaster.com/discovery/v2/events.json?${params.toString()}`;
+
+  try {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`Ticketmaster request failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const events = data._embedded?.events || [];
+
+    return {
+      statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify({ events }),
+    };
+  } catch (error) {
+    return {
+      statusCode: 500,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify({
+        error: "Could not fetch events",
+      }),
+    };
+  }
+};
+
