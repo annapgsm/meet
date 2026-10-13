@@ -1,7 +1,4 @@
 // src/api.js
-import NProgress from 'nprogress';
-import mockData from './mock-data';
-
 
 /**
  * @param {*} events:
@@ -24,10 +21,48 @@ const checkToken = async (accessToken) => {
  return result;
 };
 
+export const normalizeEvent = (event) => {
+  const venue = event._embedded?.venues?.[0];
+
+  const startDate =
+    event.dates?.start?.dateTime ||
+    event.dates?.start?.localDate;
+
+  return {
+    id: event.id,
+    summary: event.name,
+    created: startDate,
+    description: event.info || event.pleaseNote || "",
+    location: [venue?.name, venue?.city?.name]
+      .filter(Boolean)
+      .join(", "),
+
+    // useful later for the redesign
+    image: event.images?.[0]?.url || "",
+    url: event.url || "",
+  };
+};
+
+export const getEvents = async (city = "Berlin") => {
+  const url = `https://f7fi0rjwj8.execute-api.eu-central-1.amazonaws.com/api/events?city=${encodeURIComponent(city)}`;
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Could not fetch events: ${response.status}`);
+  }
+
+  const result = await response.json();
+
+return (result.events || [])
+  .map(normalizeEvent)
+  .filter((event) => event.created);
+
+};
 /**
  * This function will fetch the list of all events
  */
-
+/*
 export const getEvents = async () => {
   NProgress.start();
 
@@ -80,6 +115,7 @@ export const getEvents = async () => {
     return fallbackEvents;
   }
 };
+*/
 
 export const getAccessToken = async () => {
     const accessToken = localStorage.getItem('access_token');
