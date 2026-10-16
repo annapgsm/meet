@@ -43,10 +43,12 @@ const App = () => {
 
     const filtered = city === "See all cities"
       ? allEvents
-      : allEvents.filter((event) => event.location === city);
+      : allEvents.filter(
+        (event) => (event.city || event.location) === city
+      );
 
-    setFilteredEvents(filtered);                 // ✅ charts get ALL filtered
-    setEvents(filtered.slice(0, numEvents));     // ✅ list gets only first N
+    setFilteredEvents(filtered);               
+    setEvents(filtered.slice(0, numEvents));     
     setAllLocations(extractLocations(allEvents));
   };
 

@@ -120,15 +120,19 @@ module.exports.getCalendarEvents = async (event)=> {
 };
 
 module.exports.getEvents = async (event) => {
-  const city = event.queryStringParameters?.city || "Berlin";
+  const city = event.queryStringParameters?.city;
   const apiKey = process.env.TICKETMASTER_API_KEY;
 
   const params = new URLSearchParams({
     apikey: apiKey,
-    city: city,
-    size: "20",
+    countryCode: "DE",
+    size: "100",
     sort: "date,asc",
   });
+
+  if (city) {
+    params.append("city", city);
+  }
 
   const url = `https://app.ticketmaster.com/discovery/v2/events.json?${params.toString()}`;
 
@@ -149,6 +153,7 @@ module.exports.getEvents = async (event) => {
       },
       body: JSON.stringify({ events }),
     };
+    
   } catch (error) {
     return {
       statusCode: 500,

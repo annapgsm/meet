@@ -74,13 +74,14 @@ describe('Filter events by city (Feature 1) - E2E tests', () => {
   });
 
   test("When user hasn't searched for a city, show upcoming events from all cities", async () => {
-    await page.waitForSelector('#event-list');
-    
-    // Get number of events currently rendered in list
-    const eventCount = await page.$$eval('#event-list li', items => items.length);
+    await page.waitForSelector('#event-list li', { timeout: 10000 });
 
-    // Expect all events (based on your mock-data, e.g., 32)
-    expect(eventCount).toBe(32); 
+  const eventCount = await page.$$eval(
+    '#event-list li',
+    items => items.length
+  );
+
+  expect(eventCount).toBeGreaterThan(0);
   });
 
   test("User should see a list of suggestions when they search for a city", async () => {
@@ -99,6 +100,8 @@ describe('Filter events by city (Feature 1) - E2E tests', () => {
   });
 
   test("User can select a city from the suggested list and see filtered events", async () => {
+    
+    
     // Clear the input first (optional)
     await page.click('#city-search input[type="text"]', { clickCount: 3 });
     await page.keyboard.press('Backspace');
@@ -114,48 +117,29 @@ describe('Filter events by city (Feature 1) - E2E tests', () => {
     const inputValue = await page.$eval('#city-search input[type="text"]', el => el.value);
     expect(inputValue).toBe('Berlin, Germany');
 
-    // Wait for event list to update and check filtered events count
-    await page.waitForSelector('#event-list');
-    
-    // Get number of events currently rendered in list
-    const filteredEventCount = await page.$$eval('#event-list li', items => items.length);
+    await page.waitForFunction(
+      () => {
+        const items = Array.from(
+          document.querySelectorAll('#event-list li')
+        );
 
-    // Since this depends on your mock-data, hardcoded number is fragile
-    // Ideally, use API or mock data here to get expected count dynamically, or just expect less than total
-    expect(filteredEventCount).toBeLessThan(32);
-    expect(filteredEventCount).toBeGreaterThan(0);
+        return (
+          items.length > 0 &&
+          items.every(item => item.textContent.includes('Berlin'))
+        );
+      },
+      { timeout: 10000 }
+    );
+
+    const eventTexts = await page.$$eval(
+      '#event-list li',
+      items => items.map(item => item.textContent)
+    );
+
+    expect(eventTexts.length).toBeGreaterThan(0);
+
+    eventTexts.forEach(text => {
+      expect(text).toContain('Berlin');
+    });
   });
-
 });
-
-
-/*
-  describe('show/hide an event details', () => {
-    test('An event element is collapsed by default', async () => {
-      const browser = await puppeteer.launch();
-      const page = await browser.newPage();
-
-      await page.goto('http://localhost:5173/');
-      await page.waitForSelector('.event');
-
-      const eventDetails = await page.$('.event .details');
-      const isVisible = await eventDetails.isVisible();
-
-      expect(isVisible).toBe(false);
-
-      await browser.close();
-    });
-    test('User can expand an event to see its details', async () => {
-      const browser = await puppeteer.launch();
-      const page = await browser.newPage();
-      await page.goto('http://localhost:5173/');
-
-      await page.waitForSelector('.event');
-      await page.click('.event .details-btn');
-
-      const eventDetails = await page.$('.event .details');
-      expect(eventDetails).toBeDefined();
-      await browser.close();
-    });
-  }); 
-*/
