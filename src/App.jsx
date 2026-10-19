@@ -6,6 +6,8 @@ import CityEventsChart from './components/CityEventsChart';
 import EventGenresChart from './components/EventGenresChart';
 import ThemeToggle from "./components/ThemeToggle";
 import Icon from "./components/Icon";
+import TimeFilter from "./components/TimeFilter";
+import { matchesDate } from "./utils/dateFilters";
 import { getEvents, extractLocations } from './api';
 import { InfoAlert, ErrorAlert, WarningAlert } from './components/Alert';
 
@@ -34,19 +36,30 @@ const App = () => {
   const [currentNOE, setCurrentNOE] = useState(32);
   const [allLocations, setAllLocations] = useState([]);
   const [currentCity, setCurrentCity] = useState("See all cities");
+  const [dateFilter, setDateFilter] = useState("any");
+  const [customDate, setCustomDate] = useState("");
   const [infoAlert, setInfoAlert] = useState("");
   const [errorAlert, setErrorAlert] = useState("");
   const [warningAlert, setWarningAlert] = useState("");
 
-  const fetchData = async (numEvents, city) => {
+  const fetchData = async (numEvents, city, when, selectedDate) => {
     const allEvents = await getEvents();
     if (!allEvents) return;
 
-    const filtered = city === "See all cities"
-      ? allEvents
-      : allEvents.filter(
-        (event) => (event.city || event.location) === city
-      );
+    const filtered = allEvents.filter((event) => {
+      const matchesCity =
+        city === "See all cities" ||
+        (event.city || event.location) === city;
+
+      const matchesSelectedDate =
+        matchesDate(
+          event,
+          when,
+          selectedDate
+        );
+
+      return matchesCity && matchesSelectedDate;
+    });
 
     setFilteredEvents(filtered);               
     setEvents(filtered.slice(0, numEvents));     
@@ -60,8 +73,8 @@ const App = () => {
       setWarningAlert("You are currently offline. The displayed list may not be up to date.");
     }
 
-    fetchData(currentNOE, currentCity);
-  }, [currentCity, currentNOE]);
+    fetchData(currentNOE, currentCity, dateFilter, customDate);
+  }, [ currentCity, currentNOE, dateFilter, customDate,]);
 
   const featuredEvent = events[0];
 
@@ -156,19 +169,12 @@ const App = () => {
               </div>
             </div>
 
-            <div className="hero-search-field">
-              <Icon name="ticket" />
-
-              <div className="hero-search-control">
-                <label>Results to show</label>
-
-                <NumberOfEvents
-                  currentNOE={currentNOE}
-                  setCurrentNOE={setCurrentNOE}
-                  setErrorAlert={setErrorAlert}
-                />
-              </div>
-            </div>
+            <TimeFilter
+              value={dateFilter}
+              customDate={customDate}
+              onChange={setDateFilter}
+              onCustomDateChange={setCustomDate}
+            />
 
             <button
               className="search-action"
@@ -239,6 +245,16 @@ const App = () => {
           className="events-section"
           id="events"
         >
+          <div className="results-controls">
+            <span>Results to show</span>
+
+            <NumberOfEvents
+              currentNOE={currentNOE}
+              setCurrentNOE={setCurrentNOE}
+              setErrorAlert={setErrorAlert}
+            />
+          </div>
+
           <EventList events={events} />
         </section>
       </main>
