@@ -5,6 +5,7 @@ import NumberOfEvents from './components/NumberOfEvents';
 import CityEventsChart from './components/CityEventsChart';
 import EventGenresChart from './components/EventGenresChart';
 import ThemeToggle from "./components/ThemeToggle";
+import Icon from "./components/Icon";
 import { getEvents, extractLocations } from './api';
 import { InfoAlert, ErrorAlert, WarningAlert } from './components/Alert';
 
@@ -62,46 +63,185 @@ const App = () => {
     fetchData(currentNOE, currentCity);
   }, [currentCity, currentNOE]);
 
+  const featuredEvent = events[0];
+
   return (
-    <div className={`App ${theme}`}>
-      <header className="app-header">
-        <h1>City Events Explorer</h1>
-        <div className="controls">
-          <CitySearch
-            allLocations={allLocations}
-            setCurrentCity={setCurrentCity}
-            setInfoAlert={setInfoAlert}
-            setErrorAlert={setErrorAlert}
-          />
 
-          <NumberOfEvents
-            currentNOE={currentNOE}
-            setCurrentNOE={setCurrentNOE}
-            setErrorAlert={setErrorAlert}
-          />
+    <div className={`App app ${theme}`}>
+      <nav className="nav shell" aria-label="Main navigation">
+        <button
+          className="brand"
+          onClick={() =>
+            window.scrollTo({
+              top: 0,
+              behavior: "smooth",
+            })
+          }
+        >
+          <span>m</span>
+          meet
+        </button>
 
-          <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
+        <div className="nav-links">
+          <button
+            onClick={() =>
+              document
+                .getElementById("events")
+                ?.scrollIntoView({ behavior: "smooth" })
+            }
+          >
+            Discover
+          </button>
+
+          <button
+            onClick={() =>
+              document
+                .getElementById("insights")
+                ?.scrollIntoView({ behavior: "smooth" })
+            }
+          >
+            City pulse
+          </button>
         </div>
-      </header>
+
+        <div className="nav-actions">
+          <ThemeToggle
+            theme={theme}
+            toggleTheme={toggleTheme}
+          />
+        </div>
+      </nav>
 
       <div className="alerts-container">
         {infoAlert.length ? <InfoAlert text={infoAlert} /> : null}
         {errorAlert.length ? <ErrorAlert text={errorAlert} /> : null}
-        {warningAlert.length ? <WarningAlert text={warningAlert} /> : null}
+        {warningAlert.length ? (
+          <WarningAlert text={warningAlert} />
+        ) : null}
       </div>
 
-      <section className="charts-section">
-        <div className="charts-container">
-          {/* ✅ Charts use ALL events for the selected city */}
-          <EventGenresChart events={filteredEvents} />
-          <CityEventsChart allLocations={allLocations} events={filteredEvents} />
-        </div>
-      </section>
+      <main>
+        <section className="hero shell">
+          <div className="hero-kicker">
+            <span>
+              <Icon name="spark" size={14} />
+            </span>
+            Germany is happening
+          </div>
 
-      <section className="events-section">
-        {/* ✅ List uses only the displayed number of events */}
-        <EventList events={events} />
-      </section>
+          <h1 className="hero-title">
+            Go out.
+            <br />
+            <em>Feel something.</em>
+          </h1>
+
+          <p className="hero-sub">
+            Concerts, exhibitions, comedy and more.
+            Discover what is happening in German cities.
+          </p>
+
+          <div className="hero-search-panel">
+            <div className="hero-search-field">
+              <Icon name="pin" />
+
+              <div className="hero-search-control">
+                <label>Where</label>
+
+                <CitySearch
+                  allLocations={allLocations}
+                  setCurrentCity={setCurrentCity}
+                  setInfoAlert={setInfoAlert}
+                  setErrorAlert={setErrorAlert}
+                />
+              </div>
+            </div>
+
+            <div className="hero-search-field">
+              <Icon name="ticket" />
+
+              <div className="hero-search-control">
+                <label>Results to show</label>
+
+                <NumberOfEvents
+                  currentNOE={currentNOE}
+                  setCurrentNOE={setCurrentNOE}
+                  setErrorAlert={setErrorAlert}
+                />
+              </div>
+            </div>
+
+            <button
+              className="search-action"
+              onClick={() =>
+                document
+                  .getElementById("events")
+                  ?.scrollIntoView({ behavior: "smooth" })
+              }
+            >
+              See what's on
+              <Icon name="arrow" />
+            </button>
+          </div>
+
+          <div
+            className={`hero-visual ${
+              featuredEvent?.image ? "" : "hero-placeholder"
+            }`}
+          >
+            {featuredEvent?.image ? (
+              <img
+                src={featuredEvent.image}
+                alt=""
+              />
+            ) : null}
+
+            <div className="hero-overlay">
+              <span>
+                {featuredEvent
+                  ? "First up near you"
+                  : "Live from Germany"}
+              </span>
+
+              <strong>
+                {featuredEvent?.summary ||
+                  "Your city, your plans"}
+              </strong>
+
+              <button
+                onClick={() =>
+                  document
+                    .getElementById("events")
+                    ?.scrollIntoView({ behavior: "smooth" })
+                }
+              >
+                Explore events
+                <Icon name="arrow" />
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section
+          className="charts-section"
+          id="insights"
+        >
+          <div className="charts-container">
+            <EventGenresChart events={filteredEvents} />
+
+            <CityEventsChart
+              allLocations={allLocations}
+              events={filteredEvents}
+            />
+          </div>
+        </section>
+
+        <section
+          className="events-section"
+          id="events"
+        >
+          <EventList events={events} />
+        </section>
+      </main>
     </div>
   );
 };
