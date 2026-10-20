@@ -43,6 +43,20 @@ const App = () => {
   const [infoAlert, setInfoAlert] = useState("");
   const [errorAlert, setErrorAlert] = useState("");
   const [warningAlert, setWarningAlert] = useState("");
+  const [savedEvents, setSavedEvents] = useState(() => {
+    try {
+      const saved =
+        localStorage.getItem("meet-saved-events");
+
+      return saved
+        ? JSON.parse(saved)
+        : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [showMyPlans, setShowMyPlans] = useState(false);
 
   const fetchData = async (numEvents, city, when, selectedDate, category) => {
     const allEvents = await getEvents();
@@ -86,6 +100,13 @@ const App = () => {
     fetchData(currentNOE, currentCity, dateFilter, customDate, categoryFilter);
   }, [ currentCity, currentNOE, dateFilter, customDate, categoryFilter]);
 
+  useEffect(() => {
+    localStorage.setItem(
+      "meet-saved-events",
+      JSON.stringify(savedEvents)
+    );
+  }, [savedEvents]);
+
   const featuredEvent = events[0];
   const cityLabel =
     currentCity === "See all cities"
@@ -121,6 +142,33 @@ const App = () => {
         ? ""
         : category
     );
+  };
+
+  const savedEventIds =
+    savedEvents.map((event) => event.id);
+
+  const displayedEvents =
+    showMyPlans
+      ? savedEvents
+      : events;
+
+  const toggleSavedEvent = (event) => {
+    setSavedEvents((current) => {
+      const alreadySaved =
+        current.some(
+          (savedEvent) =>
+            savedEvent.id === event.id
+        );
+
+      if (alreadySaved) {
+        return current.filter(
+          (savedEvent) =>
+            savedEvent.id !== event.id
+        );
+      }
+
+      return [...current, event];
+    });
   };
 
   return (
@@ -163,6 +211,28 @@ const App = () => {
         </div>
 
         <div className="nav-actions">
+          <button
+            className={`my-plans-trigger ${
+              showMyPlans ? "active" : ""
+            }`}
+            onClick={() =>
+              setShowMyPlans(
+                (current) => !current
+              )
+            }
+          >
+            <Icon
+              name="bookmark"
+              size={16}
+            />
+
+            <span>My plans</span>
+
+            <strong>
+              {savedEvents.length}
+            </strong>
+          </button>
+
           <ThemeToggle
             theme={theme}
             toggleTheme={toggleTheme}
@@ -295,11 +365,15 @@ const App = () => {
           <div className="section-heading">
             <div>
               <span className="eyebrow">
-                UPCOMING EVENTS
+                {showMyPlans
+                  ? "SAVED EVENTS"
+                  : "UPCOMING EVENTS"}
               </span>
 
               <h2>
-                {cityLabel} is calling.
+                {showMyPlans
+                  ? "Your plans."
+                  : `${cityLabel} is calling.`}
               </h2>
             </div>
 
@@ -312,122 +386,146 @@ const App = () => {
           </div>
 
           <div className="results-meta">
-            <div className="results-summary">
-              <strong>
-                {resultDescription}
-              </strong>
+            <div className="results-meta">
+              {showMyPlans ? (
+                <div className="plans-summary">
+                  <strong>
+                    {savedEvents.length}{" "}
+                    {savedEvents.length === 1
+                      ? "saved event"
+                      : "saved events"}
+                  </strong>
 
-              {filteredEvents.length > 0 ? (
-                <span>
-                  {events.length} currently shown
-                </span>
-              ) : null}
-            </div>
+                  <button
+                    className="clear-filter"
+                    onClick={() => setShowMyPlans(false)}
+                  >
+                    Back to discovery
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="results-summary">
+                    <strong>
+                      {resultDescription}
+                    </strong>
 
-            <div className="results-controls">
-              {currentCity !==
-              "See all cities" ? (
-                <button
-                  className="clear-filter"
-                  onClick={() =>
-                    setCurrentCity(
-                      "See all cities"
-                    )
-                  }
-                >
-                  Clear city
-                </button>
-              ) : null}
+                    {filteredEvents.length > 0 ? (
+                      <span>
+                        {events.length} currently shown
+                      </span>
+                    ) : null}
+                  </div>
 
-              <NumberOfEvents
-                currentNOE={currentNOE}
-                setCurrentNOE={setCurrentNOE}
-                totalEvents={
-                  filteredEvents.length
-                }
-              />
+                  <div className="results-controls">
+                    {currentCity !== "See all cities" ? (
+                      <button
+                        className="clear-filter"
+                        onClick={() =>
+                          setCurrentCity("See all cities")
+                        }
+                      >
+                        Clear city
+                      </button>
+                    ) : null}
+
+                    <NumberOfEvents
+                      currentNOE={currentNOE}
+                      setCurrentNOE={setCurrentNOE}
+                      totalEvents={filteredEvents.length}
+                    />
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
-          <div
-            className="quick-filters"
-            aria-label="Quick event filters"
-          >
-            <span>
-              What do you feel like?
-            </span>
+          {!showMyPlans ? (
 
-            <button
-              className={
-                dateFilter === "tonight"
-                  ? "active"
-                  : ""
-              }
-              onClick={() =>
-                setDateFilter(
-                  dateFilter === "tonight"
-                    ? "any"
-                    : "tonight"
-                )
-              }
+            <div
+              className="quick-filters"
+              aria-label="Quick event filters"
             >
-              Tonight
-            </button>
+              <span>
+                What do you feel like?
+              </span>
 
-            <button
-              className={
-                dateFilter === "weekend"
-                  ? "active"
-                  : ""
-              }
-              onClick={() =>
-                setDateFilter(
-                  dateFilter === "weekend"
-                    ? "any"
-                    : "weekend"
-                )
-              }
-            >
-              This weekend
-            </button>
-
-            {[
-              "Music",
-              "Comedy",
-              "Culture",
-              "Sports",
-            ].map((category) => (
               <button
-                key={category}
                 className={
-                  categoryFilter === category
+                  dateFilter === "tonight"
                     ? "active"
                     : ""
                 }
                 onClick={() =>
-                  toggleCategory(category)
+                  setDateFilter(
+                    dateFilter === "tonight"
+                      ? "any"
+                      : "tonight"
+                  )
                 }
               >
-                {category}
+                Tonight
               </button>
-            ))}
 
-            {(dateFilter !== "any" ||
-              categoryFilter) && (
               <button
-                className="reset-filters"
-                onClick={() => {
-                  setDateFilter("any");
-                  setCustomDate("");
-                  setCategoryFilter("");
-                }}
+                className={
+                  dateFilter === "weekend"
+                    ? "active"
+                    : ""
+                }
+                onClick={() =>
+                  setDateFilter(
+                    dateFilter === "weekend"
+                      ? "any"
+                      : "weekend"
+                  )
+                }
               >
-                Reset
+                This weekend
               </button>
-            )}
-          </div>
 
-          <EventList events={events} />
+              {[
+                "Music",
+                "Comedy",
+                "Culture",
+                "Sports",
+              ].map((category) => (
+                <button
+                  key={category}
+                  className={
+                    categoryFilter === category
+                      ? "active"
+                      : ""
+                  }
+                  onClick={() =>
+                    toggleCategory(category)
+                  }
+                >
+                  {category}
+                </button>
+              ))}
+
+              {(dateFilter !== "any" ||
+                categoryFilter) && (
+                <button
+                  className="reset-filters"
+                  onClick={() => {
+                    setDateFilter("any");
+                    setCustomDate("");
+                    setCategoryFilter("");
+                  }}
+                >
+                  Reset
+                </button>
+              )}
+            </div>
+          ) : null}
+
+          <EventList 
+            events={displayedEvents}
+            savedEventIds={savedEventIds}
+            onToggleSave={toggleSavedEvent}
+          />
         </section>
       </main>
     </div>

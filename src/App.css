@@ -1679,3 +1679,159 @@ input[type="number"] {
     align-items: stretch;
   }
 }
+
+/* =========================================
+   CHECKPOINT 5 — MY PLANS
+   ========================================= */
+
+.my-plans-trigger {
+  min-height: 43px;
+
+  border: 1px solid var(--line);
+  border-radius: 999px;
+
+  padding: 0 13px;
+
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  color: var(--ink);
+  background: transparent;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.my-plans-trigger strong {
+  min-width: 20px;
+  height: 20px;
+
+  padding: 0 5px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 999px;
+
+  color: #171714;
+  background: var(--lime);
+
+  font-size: 9px;
+}
+
+.my-plans-trigger:hover,
+.my-plans-trigger.active {
+  border-color: var(--ink);
+
+  color: var(--paper);
+  background: var(--ink);
+}
+
+
+/* Bookmark on event image */
+
+.save-event {
+  position: absolute;
+  z-index: 2;
+
+  top: 14px;
+  right: 14px;
+
+  width: 39px;
+  height: 39px;
+
+  border: 0;
+  border-radius: 50%;
+
+  padding: 0;
+
+  display: grid;
+  place-items: center;
+
+  color: #171714;
+  background: rgba(
+    251,
+    250,
+    246,
+    0.92
+  );
+
+  cursor: pointer;
+
+  backdrop-filter: blur(7px);
+
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.save-event:hover {
+  transform: scale(1.06);
+
+  color: var(--coral);
+}
+
+.save-event.saved {
+  color: white;
+  background: var(--coral);
+}
+
+.save-event.saved svg {
+  fill: currentColor;
+}
+
+
+/* Saved mode */
+
+.plans-summary {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.plans-summary strong {
+  color: var(--ink);
+
+  font-family:
+    "DM Serif Display",
+    serif;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.plans-summary .clear-filter {
+  border: 0;
+  border-bottom: 1px solid
+    var(--ink);
+
+  padding: 0 0 3px;
+
+  color: var(--ink);
+  background: transparent;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  cursor: pointer;
+}
+
+@media (max-width: 620px) {
+  .my-plans-trigger span {
+    display: none;
+  }
+
+  .my-plans-trigger {
+    padding: 0 10px;
+  }
+}

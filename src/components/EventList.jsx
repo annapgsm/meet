@@ -1,7 +1,11 @@
 import React from "react";
 import Event from "./Event";
 
-const EventList = ({ events }) => {
+const EventList = ({
+  events,
+  savedEventIds = [],
+  onToggleSave = () => {},
+}) => {
   return (
     <ul
       id="event-list"
@@ -12,6 +16,12 @@ const EventList = ({ events }) => {
             <Event
               key={event.id}
               event={event}
+              isSaved={savedEventIds.includes(
+                event.id
+              )}
+              onToggleSave={
+                onToggleSave
+              }
             />
           ))
         : null}

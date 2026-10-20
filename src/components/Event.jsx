@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import Icon from "./Icon";
 
-function Event({ event }) {
+function Event({
+  event,
+  isSaved = false,
+  onToggleSave = () => {},
+}) {
   const [showDetails, setShowDetails] = useState(false);
 
   const start = new Date(event.created);
@@ -94,6 +98,27 @@ function Event({ event }) {
             />
           </div>
         )}
+
+        <button
+          type="button"
+          className={`save-event ${
+            isSaved ? "saved" : ""
+          }`}
+          aria-label={
+            isSaved
+              ? `Remove ${event.summary} from My Plans`
+              : `Save ${event.summary} to My Plans`
+          }
+          aria-pressed={isSaved}
+          onClick={() =>
+            onToggleSave(event)
+          }
+        >
+          <Icon
+            name="bookmark"
+            size={18}
+          />
+        </button>
 
         <span className="date-tile">
           <strong>{day}</strong>
