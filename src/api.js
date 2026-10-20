@@ -77,11 +77,22 @@ export const getEvents = async (city = "", fetchFn) => {
     typeof process !== "undefined" &&
     process.env.NODE_ENV === "test";
 
-  // Existing component tests can keep using the known mock dataset
+  // Use mock data in tests, but keep the same city-filtering behaviour
   if (isTest && !fetchFn) {
-    return Array.isArray(mockData)
+    const events = Array.isArray(mockData)
       ? mockData
       : mockData.events || [];
+
+    // No city selected = return all mock events
+    if (!city) {
+      return events;
+    }
+
+    // City selected = imitate the backend's city filtering
+    return events.filter(
+      (event) =>
+        (event.city || event.location) === city
+    );
   }
 
   const baseUrl =

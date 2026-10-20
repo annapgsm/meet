@@ -1,26 +1,38 @@
-import React, { useEffect, useState } from 'react';
-import CitySearch from './components/CitySearch';
-import EventList from './components/EventList';
-import NumberOfEvents from './components/NumberOfEvents';
-import CityEventsChart from './components/CityEventsChart';
+import React, { useEffect, useState } from "react";
+
+import CitySearch from "./components/CitySearch";
+import EventList from "./components/EventList";
+import NumberOfEvents from "./components/NumberOfEvents";
+import CityEventsChart from "./components/CityEventsChart";
 import WhenItsHappening from "./components/WhenItsHappening";
 import ThemeToggle from "./components/ThemeToggle";
 import Icon from "./components/Icon";
 import TimeFilter from "./components/TimeFilter";
+
 import { matchesCategory } from "./utils/categoryFilters";
 import { matchesDate } from "./utils/dateFilters";
-import { getEvents, extractLocations } from './api';
-import { InfoAlert, ErrorAlert, WarningAlert } from './components/Alert';
+import { getEvents, extractLocations } from "./api";
 
-import './App.css';
+import {
+  InfoAlert,
+  ErrorAlert,
+  WarningAlert,
+} from "./components/Alert";
+
+import "./App.css";
+
 
 const App = () => {
   // Theme
   const [theme, setTheme] = useState("light");
 
   useEffect(() => {
-    const saved = localStorage.getItem("theme");
-    if (saved) setTheme(saved);
+    const savedTheme =
+      localStorage.getItem("theme");
+
+    if (savedTheme) {
+      setTheme(savedTheme);
+    }
   }, []);
 
   useEffect(() => {
@@ -28,78 +40,135 @@ const App = () => {
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+    setTheme((current) =>
+      current === "light"
+        ? "dark"
+        : "light"
+    );
   };
 
-  // App state
-  const [events, setEvents] = useState([]); // ✅ displayed (sliced) events for the list
-  const [filteredEvents, setFilteredEvents] = useState([]); // ✅ full filtered events for charts
+
+  // Event and filter state
+  const [events, setEvents] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState([]);
   const [currentNOE, setCurrentNOE] = useState(32);
   const [allLocations, setAllLocations] = useState([]);
   const [currentCity, setCurrentCity] = useState("See all cities");
   const [dateFilter, setDateFilter] = useState("any");
   const [customDate, setCustomDate] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
+
+  // Alerts
   const [infoAlert, setInfoAlert] = useState("");
   const [errorAlert, setErrorAlert] = useState("");
   const [warningAlert, setWarningAlert] = useState("");
-  const [savedEvents, setSavedEvents] = useState(() => {
-    try {
-      const saved =
-        localStorage.getItem("meet-saved-events");
 
-      return saved
-        ? JSON.parse(saved)
-        : [];
-    } catch {
-      return [];
-    }
-  });
+  // Saved events persist in localStorage
+  const [savedEvents, setSavedEvents] =
+    useState(() => {
+      try {
+        const saved =
+          localStorage.getItem(
+            "meet-saved-events"
+          );
+
+        return saved
+          ? JSON.parse(saved)
+          : [];
+      } catch {
+        return [];
+      }
+    });
 
   const [showMyPlans, setShowMyPlans] = useState(false);
 
-  const fetchData = async (numEvents, city, when, selectedDate, category) => {
-    const allEvents = await getEvents();
-    if (!allEvents) return;
+  // Fetch Germany-wide events or events for one selected city
+  const fetchData = async (
+    numEvents,
+    city,
+    when,
+    selectedDate,
+    category
+  ) => {
+    // No city = Germany-wide request
+    const cityQuery =
+      city === "See all cities"
+        ? ""
+        : city;
 
-    const filtered = allEvents.filter((event) => {
+    const fetchedEvents =
+      await getEvents(cityQuery);
 
-      const matchesCity =
-        city === "See all cities" ||
-        (event.city || event.location) === city;
+    if (!fetchedEvents) return;
 
-      const matchesSelectedDate =
-        matchesDate(
-          event,
-          when,
-          selectedDate
-        );
 
-      const matchesSelectedCategory =
-        matchesCategory(event, category);
-        
-      return (
-        matchesCity &&
-        matchesSelectedDate &&
-        matchesSelectedCategory
+    // Keep the autocomplete based on the Germany-wide results
+    if (cityQuery === "") {
+      setAllLocations(
+        extractLocations(fetchedEvents)
       );
-    });
+    }
 
-    setFilteredEvents(filtered);               
-    setEvents(filtered.slice(0, numEvents));     
-    setAllLocations(extractLocations(allEvents));
+
+    // Ticketmaster already filters the city now.
+    // We only filter date and category in the frontend.
+    const filtered =
+      fetchedEvents.filter((event) => {
+        const matchesSelectedDate =
+          matchesDate(
+            event,
+            when,
+            selectedDate
+          );
+
+        const matchesSelectedCategory =
+          matchesCategory(
+            event,
+            category
+          );
+
+        return (
+          matchesSelectedDate &&
+          matchesSelectedCategory
+        );
+      });
+
+
+    // Full list for result count + City Pulse
+    setFilteredEvents(filtered);
+
+    // Only display the selected number of cards
+    setEvents(
+      filtered.slice(0, numEvents)
+    );
   };
-
+  // Refetch when filters change
   useEffect(() => {
     if (navigator.onLine) {
       setWarningAlert("");
     } else {
-      setWarningAlert("You are currently offline. The displayed list may not be up to date.");
+      setWarningAlert(
+        "You are currently offline. The displayed list may not be up to date."
+      );
     }
 
-    fetchData(currentNOE, currentCity, dateFilter, customDate, categoryFilter);
-  }, [ currentCity, currentNOE, dateFilter, customDate, categoryFilter]);
+    fetchData(
+      currentNOE,
+      currentCity,
+      dateFilter,
+      customDate,
+      categoryFilter
+    );
+  }, [
+    currentCity,
+    currentNOE,
+    dateFilter,
+    customDate,
+    categoryFilter,
+  ]);
 
+
+  // Save My Plans whenever it changes
   useEffect(() => {
     localStorage.setItem(
       "meet-saved-events",
@@ -107,27 +176,39 @@ const App = () => {
     );
   }, [savedEvents]);
 
+
+  // Hero uses the first displayed event
   const featuredEvent = events[0];
+
+
+  // Short city name for headings
   const cityLabel =
     currentCity === "See all cities"
       ? "Germany"
       : currentCity.split(",")[0];
 
+
+  // Text shown beside result count
   const dateLabels = {
     any: "",
     tonight: " tonight",
     tomorrow: " tomorrow",
     weekend: " this weekend",
     next7: " in the next 7 days",
+
     custom: customDate
       ? ` on ${new Date(
           `${customDate}T12:00:00`
-        ).toLocaleDateString("en-GB", {
-          day: "numeric",
-          month: "long",
-        })}`
+        ).toLocaleDateString(
+          "en-GB",
+          {
+            day: "numeric",
+            month: "long",
+          }
+        )}`
       : "",
   };
+
 
   const resultDescription =
     `${filteredEvents.length} ${
@@ -136,6 +217,8 @@ const App = () => {
         : "events"
     }${dateLabels[dateFilter]}`;
 
+
+  // Clicking an active category removes it
   const toggleCategory = (category) => {
     setCategoryFilter((current) =>
       current === category
@@ -144,14 +227,22 @@ const App = () => {
     );
   };
 
-  const savedEventIds =
-    savedEvents.map((event) => event.id);
 
+  // IDs let each card know if it is saved
+  const savedEventIds =
+    savedEvents.map(
+      (event) => event.id
+    );
+
+
+  // My Plans swaps discovery events for saved ones
   const displayedEvents =
     showMyPlans
       ? savedEvents
       : events;
 
+
+  // Save or remove an event
   const toggleSavedEvent = (event) => {
     setSavedEvents((current) => {
       const alreadySaved =
@@ -167,14 +258,24 @@ const App = () => {
         );
       }
 
-      return [...current, event];
+      return [
+        ...current,
+        event,
+      ];
     });
   };
 
-  return (
 
-    <div className={`App app ${theme}`}>
-      <nav className="nav shell" aria-label="Main navigation">
+  return (
+    <div
+      className={`App app ${theme}`}
+      id="top"
+    >
+      {/* Navigation */}
+      <nav
+        className="nav shell"
+        aria-label="Main navigation"
+      >
         <button
           className="brand"
           onClick={() =>
@@ -193,7 +294,9 @@ const App = () => {
             onClick={() =>
               document
                 .getElementById("events")
-                ?.scrollIntoView({ behavior: "smooth" })
+                ?.scrollIntoView({
+                  behavior: "smooth",
+                })
             }
           >
             Discover
@@ -203,7 +306,9 @@ const App = () => {
             onClick={() =>
               document
                 .getElementById("insights")
-                ?.scrollIntoView({ behavior: "smooth" })
+                ?.scrollIntoView({
+                  behavior: "smooth",
+                })
             }
           >
             City pulse
@@ -213,7 +318,9 @@ const App = () => {
         <div className="nav-actions">
           <button
             className={`my-plans-trigger ${
-              showMyPlans ? "active" : ""
+              showMyPlans
+                ? "active"
+                : ""
             }`}
             onClick={() =>
               setShowMyPlans(
@@ -240,43 +347,72 @@ const App = () => {
         </div>
       </nav>
 
+
+      {/* App alerts */}
       <div className="alerts-container">
-        {infoAlert.length ? <InfoAlert text={infoAlert} /> : null}
-        {errorAlert.length ? <ErrorAlert text={errorAlert} /> : null}
+        {infoAlert.length ? (
+          <InfoAlert
+            text={infoAlert}
+          />
+        ) : null}
+
+        {errorAlert.length ? (
+          <ErrorAlert
+            text={errorAlert}
+          />
+        ) : null}
+
         {warningAlert.length ? (
-          <WarningAlert text={warningAlert} />
+          <WarningAlert
+            text={warningAlert}
+          />
         ) : null}
       </div>
 
+
       <main>
+        {/* Hero */}
         <section className="hero shell">
           <div className="hero-kicker">
             <span>
-              <Icon name="spark" size={14} />
+              <Icon
+                name="spark"
+                size={14}
+              />
             </span>
+
             Germany is happening
           </div>
 
           <h1 className="hero-title">
             Go out.
             <br />
-            <em>Feel something.</em>
+            <em>
+              Feel something.
+            </em>
           </h1>
 
           <p className="hero-sub">
-            Concerts, exhibitions, comedy and more.
-            Discover what is happening in German cities.
+            Concerts, exhibitions,
+            comedy and more. Discover
+            what is happening in German
+            cities.
           </p>
 
+
+          {/* Main discovery controls */}
           <div className="hero-search-panel">
             <div className="hero-search-field">
               <Icon name="pin" />
 
               <div className="hero-search-control">
-                <label>Where</label>
+                <label>
+                  Where
+                </label>
 
                 <CitySearch
                   allLocations={allLocations}
+                  currentCity={currentCity}
                   setCurrentCity={setCurrentCity}
                   setInfoAlert={setInfoAlert}
                   setErrorAlert={setErrorAlert}
@@ -288,30 +424,26 @@ const App = () => {
               value={dateFilter}
               customDate={customDate}
               onChange={setDateFilter}
-              onCustomDateChange={setCustomDate}
-            />
-
-            <button
-              className="search-action"
-              onClick={() =>
-                document
-                  .getElementById("events")
-                  ?.scrollIntoView({ behavior: "smooth" })
+              onCustomDateChange={
+                setCustomDate
               }
-            >
-              See what's on
-              <Icon name="arrow" />
-            </button>
+            />
           </div>
 
+
+          {/* Featured event */}
           <div
             className={`hero-visual ${
-              featuredEvent?.image ? "" : "hero-placeholder"
+              featuredEvent?.image
+                ? ""
+                : "hero-placeholder"
             }`}
           >
             {featuredEvent?.image ? (
               <img
-                src={featuredEvent.image}
+                src={
+                  featuredEvent.image
+                }
                 alt=""
               />
             ) : null}
@@ -331,8 +463,13 @@ const App = () => {
               <button
                 onClick={() =>
                   document
-                    .getElementById("events")
-                    ?.scrollIntoView({ behavior: "smooth" })
+                    .getElementById(
+                      "events"
+                    )
+                    ?.scrollIntoView({
+                      behavior:
+                        "smooth",
+                    })
                 }
               >
                 Explore events
@@ -342,6 +479,8 @@ const App = () => {
           </div>
         </section>
 
+
+        {/* Event discovery */}
         <section
           className="events-section shell"
           id="events"
@@ -364,68 +503,85 @@ const App = () => {
             <p>
               Not plans.{" "}
               <em>
-                Stories waiting to happen.
+                Stories waiting to
+                happen.
               </em>
             </p>
           </div>
 
+
+          {/* Results info changes in My Plans */}
           <div className="results-meta">
-            <div className="results-meta">
-              {showMyPlans ? (
-                <div className="plans-summary">
+            {showMyPlans ? (
+              <div className="plans-summary">
+                <strong>
+                  {savedEvents.length}{" "}
+                  {savedEvents.length === 1
+                    ? "saved event"
+                    : "saved events"}
+                </strong>
+
+                <button
+                  type="button"
+                  className="clear-filter"
+                  onClick={() =>
+                    setShowMyPlans(false)
+                  }
+                >
+                  Back to discovery
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="results-summary">
                   <strong>
-                    {savedEvents.length}{" "}
-                    {savedEvents.length === 1
-                      ? "saved event"
-                      : "saved events"}
+                    {resultDescription}
                   </strong>
 
-                  <button
-                    className="clear-filter"
-                    onClick={() => setShowMyPlans(false)}
-                  >
-                    Back to discovery
-                  </button>
+                  {filteredEvents.length >
+                  0 ? (
+                    <span>
+                      {events.length}{" "}
+                      currently shown
+                    </span>
+                  ) : null}
                 </div>
-              ) : (
-                <>
-                  <div className="results-summary">
-                    <strong>
-                      {resultDescription}
-                    </strong>
 
-                    {filteredEvents.length > 0 ? (
-                      <span>
-                        {events.length} currently shown
-                      </span>
-                    ) : null}
-                  </div>
+                <div className="results-controls">
+                  {currentCity !==
+                  "See all cities" ? (
+                    <button
+                      type="button"
+                      className="clear-filter"
+                      onClick={() =>
+                        setCurrentCity(
+                          "See all cities"
+                        )
+                      }
+                    >
+                      Clear city
+                    </button>
+                  ) : null}
 
-                  <div className="results-controls">
-                    {currentCity !== "See all cities" ? (
-                      <button
-                        className="clear-filter"
-                        onClick={() =>
-                          setCurrentCity("See all cities")
-                        }
-                      >
-                        Clear city
-                      </button>
-                    ) : null}
-
-                    <NumberOfEvents
-                      currentNOE={currentNOE}
-                      setCurrentNOE={setCurrentNOE}
-                      totalEvents={filteredEvents.length}
-                    />
-                  </div>
-                </>
-              )}
-            </div>
+                  <NumberOfEvents
+                    currentNOE={
+                      currentNOE
+                    }
+                    setCurrentNOE={
+                      setCurrentNOE
+                    }
+                    totalEvents={
+                      filteredEvents.length
+                    }
+                  />
+                </div>
+              </>
+            )}
           </div>
 
-          {!showMyPlans ? (
 
+          {/* Category filters */}
+          {!showMyPlans ? (
             <div
               className="quick-filters"
               aria-label="Quick event filters"
@@ -433,40 +589,6 @@ const App = () => {
               <span>
                 What do you feel like?
               </span>
-
-              <button
-                className={
-                  dateFilter === "tonight"
-                    ? "active"
-                    : ""
-                }
-                onClick={() =>
-                  setDateFilter(
-                    dateFilter === "tonight"
-                      ? "any"
-                      : "tonight"
-                  )
-                }
-              >
-                Tonight
-              </button>
-
-              <button
-                className={
-                  dateFilter === "weekend"
-                    ? "active"
-                    : ""
-                }
-                onClick={() =>
-                  setDateFilter(
-                    dateFilter === "weekend"
-                      ? "any"
-                      : "weekend"
-                  )
-                }
-              >
-                This weekend
-              </button>
 
               {[
                 "Music",
@@ -489,15 +611,13 @@ const App = () => {
                 </button>
               ))}
 
-              {(dateFilter !== "any" ||
-                categoryFilter) && (
+              {/* Only resets the category selection */}
+              {categoryFilter && (
                 <button
                   className="reset-filters"
-                  onClick={() => {
-                    setDateFilter("any");
-                    setCustomDate("");
-                    setCategoryFilter("");
-                  }}
+                  onClick={() =>
+                    setCategoryFilter("")
+                  }
                 >
                   Reset
                 </button>
@@ -505,13 +625,57 @@ const App = () => {
             </div>
           ) : null}
 
-          <EventList 
+          {/* Keep the list mounted for async loading and tests */}
+          <EventList
             events={displayedEvents}
-            savedEventIds={savedEventIds}
-            onToggleSave={toggleSavedEvent}
+            savedEventIds={
+              savedEventIds
+            }
+            onToggleSave={
+              toggleSavedEvent
+            }
           />
+
+
+          {/* Empty list message */}
+          {displayedEvents.length ===
+          0 ? (
+            <div className="empty-state">
+              <Icon
+                name="spark"
+                size={28}
+              />
+
+              <h3>
+                {showMyPlans
+                  ? "No plans saved yet."
+                  : "Nothing here right now."}
+              </h3>
+
+              <p>
+                {showMyPlans
+                  ? "Save an event you like and it’ll appear here."
+                  : "Try another city, date or category."}
+              </p>
+
+              {showMyPlans ? (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowMyPlans(
+                      false
+                    )
+                  }
+                >
+                  Back to discovery
+                </button>
+              ) : null}
+            </div>
+          ) : null}
         </section>
-        
+
+
+        {/* Analytics describe discovery results */}
         {!showMyPlans ? (
           <section
             className="city-pulse"
@@ -530,14 +694,17 @@ const App = () => {
                 </div>
 
                 <p>
-                  A snapshot of the events
-                  currently in your results.
+                  A snapshot of the
+                  events currently in
+                  your results.
                 </p>
               </div>
 
               <div className="pulse-overview">
                 <strong>
-                  {filteredEvents.length}
+                  {
+                    filteredEvents.length
+                  }
                 </strong>
 
                 <span>
@@ -548,17 +715,42 @@ const App = () => {
 
               <div className="pulse-grid">
                 <CityEventsChart
-                  events={filteredEvents}
+                  events={
+                    filteredEvents
+                  }
                 />
 
                 <WhenItsHappening
-                  events={filteredEvents}
+                  events={
+                    filteredEvents
+                  }
                 />
               </div>
             </div>
           </section>
         ) : null}
       </main>
+
+
+      {/* Simple Figma-style footer */}
+      <footer className="site-footer">
+        <div className="shell figma-footer">
+          <div className="brand footer-brand">
+            <span>m</span>
+            meet
+          </div>
+
+          <p>
+            Your next favorite memory
+            is closer than you think.
+          </p>
+
+          <span className="footer-powered">
+            Powered by Ticketmaster
+            Discovery
+          </span>
+        </div>
+      </footer>
     </div>
   );
 };

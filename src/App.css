@@ -1,37 +1,3 @@
-@import url(https://fonts.googleapis.com/css?family=Roboto:500);
-
-/* ================================
-   THEME VARIABLES
-   ================================ */
-
-
-  /* LIGHT THEME DEFAULT 
-:root {
-  --color-bg: #ffffff;
-  --color-text: #222222;
-  --color-heading: #000000;
-
-  --color-input-bg: #ffffff;
-  --color-input-border: #cccccc;
-  --color-input-text: #222222;
-
-  --color-suggestion-bg: #e6e6e6;
-  --color-suggestion-hover: #d8f3f2;
-  --color-suggestion-text: #000000;
-  --color-suggestion-shadow: rgba(0, 0, 0, 0.75);
-
-  --color-event-bg: #ffffff;
-  --color-event-border: #cccccc;
-  --color-event-text: #222222;
-
-  --color-details-text: #222222;
-  --color-details-bg: transparent;
-
-  --color-button-bg: #e0e0e0;
-  --color-button-text: #000000;
-
-  --transition-speed: 0.3s;
-} */
 
 :root {
   --color-bg: #E6E8E6;
@@ -96,166 +62,14 @@
 
 .App {
   min-width: 320px;
-  width: 100vw;
-  max-width: 100%;
+  width: 100%;
   min-height: 100vh;
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  margin: 0 auto; 
+  margin: 0 auto;
 }
 
 .App * {
   box-sizing: border-box;
 }
-
-.App h1 {
-  font-family: 'Roboto', sans-serif;
-  font-weight: 700; /* heavier for navbar title */
-  margin: 0;        /* remove bottom margin since header spacing handles it */
-  font-size: 1.8rem;
-  color: var(--color-heading);
-  user-select: none;
-}
-
-
-ul {
-  padding: 0;
-  list-style: none;
-}
-
-p {
-  margin: 5px 0;
-}
-/* ================================
-   NAVBAR STYLE (App Header)
-   ================================ */
-
-.app-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 32px;
-  background-color: var(--color-bg);
-  border-bottom: 1px solid var(--color-input-border);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.app-header h1 {
-  font-size: 1.8rem;
-  color: var(--color-heading);
-  font-weight: 700;
-  user-select: none;
-}
-
-.controls {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  flex-wrap: nowrap;
-}
-
-@media (max-width: 768px) {
-  .app-header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-    padding: 16px 20px;
-  }
-
-  .controls {
-    justify-content: space-between;
-  }
-}
-
-/* ================================
-   LIGHT/ DARK MODE
-   ================================ */
-
-
-#theme-toggle {
-  margin-bottom: 10px; 
-  height: 38px;
-}
-
-/* ================================
-   INPUT FIELDS 
-   ================================ */
-
-input[type="text"],
-input[type="number"] {
-  height: 42px;
-  padding: 0 14px;
-  font-size: 0.95rem;
-  border-radius: 10px;
-  border: 1px solid var(--color-input-border);
-  background-color: var(--color-input-bg);
-  color: var(--color-input-text);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-  transition: all 0.2s ease;
-}
-
-/* Focus & Hover feedback */
-input[type="text"]:hover,
-input[type="number"]:hover,
-input[type="text"]:focus,
-input[type="number"]:focus {
-  border-color: #9FB8AD;
-  outline: none;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
-}
-
-/* Placeholder */
-input::placeholder {
-  color: #888;
-}
-
-/* Specific width for number input */
-input[type="number"] {
-  width: 180px;
-}
-
-/* ================================
-   CITY SEARCH DROPDOWN
-   ================================ */
-
-#city-search {
-  display: flex;
-  flex-direction: column;
-  margin: auto;
-  position: relative;
-}
-
-.suggestions {
-  width: 250px;
-  position: absolute;
-  top: 45px;
-  z-index: 2;
-  align-self: center;
-  margin: 0;
-  font-size: 14px;
-  box-shadow: 10px 10px 16px -12px var(--color-suggestion-shadow);
-}
-
-.suggestions > li {
-  color: var(--color-suggestion-text);
-  text-align: left;
-  padding: 8px 6px 8px 10px;
-  background-color: var(--color-suggestion-bg);
-  cursor: default;
-}
-
-.suggestions > li:last-child {
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 4px;
-}
-
-.suggestions > li:hover {
-  background-color: var(--color-suggestion-hover);
-}
-
 
 
 /* ================================
@@ -268,95 +82,6 @@ input[type="number"] {
  left: 20px;
  width: 250px;
  z-index: 1000;
-}
-
-/* ================================
-   CHARTS
-   ================================ */
-
-.charts-section {
-  width: 70%;          
-  margin: 20px auto 20px; 
-}
-
-.charts-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-@media (max-width: 768px) {
-  .charts-container {
-    grid-template-columns: 1fr;
-  }
-}
-
-.chart-card {
-  background: #fff;               /* white background */
-  border-radius: 12px;           /* rounded corners */
-  padding: 20px;                 /* spacing inside the card */
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06); /* subtle shadow */
-  display: flex;
-  flex-direction: column;        /* stack title, chart, legend vertically */
-  align-items: center;           /* center children horizontally */
-  max-width: 520px;      /* limits how wide the chart can become */
-  width: 100%;          /* allows shrinking on small screens */}
-
-.App.dark .chart-card {
-  background: #3f403f;           /* dark mode card bg */
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);  /* stronger shadow in dark mode */
-}
-
-.chart-title {
-  font-size: 1.3rem;             /* slightly larger text */
-  font-weight: 700;              /* bold font */
-  margin-bottom: 16px;           /* space below title */
-  color: var(--color-heading);   /* theme-aware text color */
-  user-select: none;             /* prevent text selection */
-  text-align: center;            /* center text */
-  width: 100%;                   /* full width for alignment */
-}
-
-/* Legend styling */
-.recharts-legend-wrapper {
-  margin-top: 50px;              /* space above legend */
-  font-weight: 600;              /* slightly bold */
-  font-size: 0.9rem;             /* smaller text */
-  color: var(--color-text);      /* theme text color */
-  text-align: center;            /* center legend text */
-  width: 100%;                   /* full width */
-  user-select: none;             /* no selection */
-}
-
-.recharts-legend-item {
-  margin-right: 25px;            /* space between legend items */
-  cursor: default;               /* no pointer on hover */
-  display: inline-flex;          /* inline with flex for alignment */
-  align-items: center;           /* vertical align color box and text */
-  gap: 6px;                     /* small gap between box and text */
-}
-
-.recharts-legend-item rect {
-  width: 14px !important;        /* size of color box */
-  height: 14px !important;
-  border-radius: 3px;            /* rounded corners on color box */
-  stroke: #ccc;                  /* subtle border on color box */
-  stroke-width: 1px;
-}
-
-
-@media (max-width: 768px) {
-  .controls {
-    flex-direction: column; /* stack inputs vertically */
-    gap: 12px;              /* spacing between inputs */
-    justify-content: stretch; /* stretch inputs full width */
-    width: 100%;            /* full width container */
-  }
-
-  .controls > * {
-    width: 100%;            /* each child takes full width */
-    max-width: none;        /* remove any max-width constraints */
-  }
 }
 
 
@@ -581,7 +306,7 @@ input[type="number"] {
   padding: 8px;
 
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr auto;
+  grid-template-columns: 1fr 1fr;
   align-items: stretch;
 
   color: #171714;
@@ -627,12 +352,12 @@ input[type="number"] {
 /* Override the old input design only inside the new hero */
 
 .hero-search-panel #city-search {
+  position: relative;
   display: block;
   margin: 0;
 }
 
-.hero-search-panel #city-search input,
-.hero-search-panel #number-of-events input {
+.hero-search-panel #city-search input {
   width: 100%;
   height: auto;
 
@@ -651,28 +376,19 @@ input[type="number"] {
 }
 
 .hero-search-panel #city-search input:hover,
-.hero-search-panel #city-search input:focus,
-.hero-search-panel #number-of-events input:hover,
-.hero-search-panel #number-of-events input:focus {
+.hero-search-panel #city-search input:focus {
   border: 0;
   box-shadow: none;
 }
 
-.hero-search-panel #number-of-events {
-  width: 100%;
-}
-
-.hero-search-panel #number-of-events input {
-  max-width: 130px;
-}
-
-
 /* City suggestions still use your existing logic */
 
 .hero-search-panel .suggestions {
+  position: absolute;
+  z-index: 20;
+
   top: calc(100% + 12px);
   left: 0;
-
   width: 100%;
   max-height: 290px;
 
@@ -850,12 +566,6 @@ input[type="number"] {
 }
 
 
-/* ---------- Spacing between new hero and old content ---------- */
-
-.charts-section {
-  margin-top: 110px;
-}
-
 
 /* ---------- Responsive shell ---------- */
 
@@ -1013,31 +723,6 @@ input[type="number"] {
 }
 
 
-.when-control select {
-  width: 100%;
-
-  border: 0;
-  outline: 0;
-
-  padding: 2px 28px 0 0;
-
-  color: #171714;
-  background: transparent;
-
-  font-size: 0.95rem;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  appearance: none;
-}
-
-.when-control svg {
-  position: absolute;
-  right: 0;
-
-  pointer-events: none;
-}
 
 .custom-date-input {
   width: 100%;
@@ -1153,7 +838,7 @@ input[type="number"] {
 .results-controls {
   width: auto;
 
-  margin: 0;
+  margin-left: auto;
 
   display: flex;
   align-items: center;
@@ -1327,10 +1012,17 @@ input[type="number"] {
   }
 
   .results-meta {
-    align-items: flex-start;
-    flex-direction: column;
+    width: 100%;
 
-    gap: 14px;
+    min-height: 84px;
+
+    padding: 22px 0 18px;
+
+    display: flex;
+    align-items: center;
+    gap: 24px;
+
+    color: var(--muted);
   }
 
   .results-summary {
@@ -1339,8 +1031,6 @@ input[type="number"] {
 
   .results-controls {
     width: 100%;
-
-    justify-content: space-between;
   }
 
   .quick-filters {
@@ -2051,5 +1741,168 @@ input[type="number"] {
 
   .pulse-chart-card {
     padding: 22px 16px;
+  }
+}
+
+/* =========================================
+   CHECKPOINT 7 — POLISH
+   ========================================= */
+
+.empty-state {
+  min-height: 300px;
+
+  padding: 60px 20px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--line);
+  border-radius: 5px;
+
+  color: var(--muted);
+
+  text-align: center;
+}
+
+.empty-state svg {
+  margin-bottom: 18px;
+
+  color: var(--coral);
+}
+
+.empty-state h3 {
+  margin: 0;
+
+  color: var(--ink);
+
+  font-family: "DM Serif Display", serif;
+  font-size: 30px;
+  font-weight: 400;
+}
+
+.empty-state p {
+  max-width: 340px;
+
+  margin: 8px 0 0;
+
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.empty-state button {
+  margin-top: 20px;
+
+  border: 0;
+  border-bottom: 1px solid var(--ink);
+
+  padding: 0 0 3px;
+
+  color: var(--ink);
+  background: transparent;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+/* =========================================
+   CHECKPOINT 7 — FOOTER
+   ========================================= */
+
+.site-footer {
+  background: var(--paper);
+}
+
+.figma-footer {
+  min-height: 150px;
+
+  padding-top: 38px;
+  padding-bottom: 38px;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+  gap: 30px;
+
+  border-top: 1px solid var(--line);
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  color: var(--ink);
+
+  font-family: "DM Serif Display", serif;
+  font-size: 25px;
+}
+
+.footer-brand > span {
+  width: 31px;
+  height: 31px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  color: #171714;
+  background: var(--coral);
+
+  font-family: "DM Sans", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.figma-footer > p {
+  max-width: 280px;
+
+  margin: 0 auto;
+
+  color: var(--ink);
+
+  font-family: "DM Serif Display", serif;
+  font-size: 17px;
+  font-style: italic;
+
+  line-height: 1.4;
+  text-align: center;
+}
+
+.footer-powered {
+  justify-self: end;
+
+  color: var(--muted);
+
+  font-size: 9px;
+  font-weight: 700;
+
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 620px) {
+  .figma-footer {
+    grid-template-columns: 1fr;
+
+    gap: 20px;
+
+    text-align: center;
+  }
+
+  .footer-brand {
+    justify-content: center;
+  }
+
+  .figma-footer > p {
+    margin: 0 auto;
+  }
+
+  .footer-powered {
+    justify-self: center;
   }
 }
