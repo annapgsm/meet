@@ -7,6 +7,7 @@ import EventGenresChart from './components/EventGenresChart';
 import ThemeToggle from "./components/ThemeToggle";
 import Icon from "./components/Icon";
 import TimeFilter from "./components/TimeFilter";
+import { matchesCategory } from "./utils/categoryFilters";
 import { matchesDate } from "./utils/dateFilters";
 import { getEvents, extractLocations } from './api';
 import { InfoAlert, ErrorAlert, WarningAlert } from './components/Alert';
@@ -38,15 +39,17 @@ const App = () => {
   const [currentCity, setCurrentCity] = useState("See all cities");
   const [dateFilter, setDateFilter] = useState("any");
   const [customDate, setCustomDate] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
   const [infoAlert, setInfoAlert] = useState("");
   const [errorAlert, setErrorAlert] = useState("");
   const [warningAlert, setWarningAlert] = useState("");
 
-  const fetchData = async (numEvents, city, when, selectedDate) => {
+  const fetchData = async (numEvents, city, when, selectedDate, category) => {
     const allEvents = await getEvents();
     if (!allEvents) return;
 
     const filtered = allEvents.filter((event) => {
+
       const matchesCity =
         city === "See all cities" ||
         (event.city || event.location) === city;
@@ -58,7 +61,14 @@ const App = () => {
           selectedDate
         );
 
-      return matchesCity && matchesSelectedDate;
+      const matchesSelectedCategory =
+        matchesCategory(event, category);
+        
+      return (
+        matchesCity &&
+        matchesSelectedDate &&
+        matchesSelectedCategory
+      );
     });
 
     setFilteredEvents(filtered);               
@@ -73,10 +83,45 @@ const App = () => {
       setWarningAlert("You are currently offline. The displayed list may not be up to date.");
     }
 
-    fetchData(currentNOE, currentCity, dateFilter, customDate);
-  }, [ currentCity, currentNOE, dateFilter, customDate,]);
+    fetchData(currentNOE, currentCity, dateFilter, customDate, categoryFilter);
+  }, [ currentCity, currentNOE, dateFilter, customDate, categoryFilter]);
 
   const featuredEvent = events[0];
+  const cityLabel =
+    currentCity === "See all cities"
+      ? "Germany"
+      : currentCity.split(",")[0];
+
+  const dateLabels = {
+    any: "",
+    tonight: " tonight",
+    tomorrow: " tomorrow",
+    weekend: " this weekend",
+    next7: " in the next 7 days",
+    custom: customDate
+      ? ` on ${new Date(
+          `${customDate}T12:00:00`
+        ).toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "long",
+        })}`
+      : "",
+  };
+
+  const resultDescription =
+    `${filteredEvents.length} ${
+      filteredEvents.length === 1
+        ? "event"
+        : "events"
+    }${dateLabels[dateFilter]}`;
+
+  const toggleCategory = (category) => {
+    setCategoryFilter((current) =>
+      current === category
+        ? ""
+        : category
+    );
+  };
 
   return (
 
@@ -227,6 +272,7 @@ const App = () => {
           </div>
         </section>
 
+        {/*
         <section
           className="charts-section"
           id="insights"
@@ -240,19 +286,145 @@ const App = () => {
             />
           </div>
         </section>
+        */}
 
         <section
-          className="events-section"
+          className="events-section shell"
           id="events"
         >
-          <div className="results-controls">
-            <span>Results to show</span>
+          <div className="section-heading">
+            <div>
+              <span className="eyebrow">
+                UPCOMING EVENTS
+              </span>
 
-            <NumberOfEvents
-              currentNOE={currentNOE}
-              setCurrentNOE={setCurrentNOE}
-              setErrorAlert={setErrorAlert}
-            />
+              <h2>
+                {cityLabel} is calling.
+              </h2>
+            </div>
+
+            <p>
+              Not plans.{" "}
+              <em>
+                Stories waiting to happen.
+              </em>
+            </p>
+          </div>
+
+          <div className="results-meta">
+            <div className="results-summary">
+              <strong>
+                {resultDescription}
+              </strong>
+
+              {filteredEvents.length > 0 ? (
+                <span>
+                  {events.length} currently shown
+                </span>
+              ) : null}
+            </div>
+
+            <div className="results-controls">
+              {currentCity !==
+              "See all cities" ? (
+                <button
+                  className="clear-filter"
+                  onClick={() =>
+                    setCurrentCity(
+                      "See all cities"
+                    )
+                  }
+                >
+                  Clear city
+                </button>
+              ) : null}
+
+              <NumberOfEvents
+                currentNOE={currentNOE}
+                setCurrentNOE={setCurrentNOE}
+                totalEvents={
+                  filteredEvents.length
+                }
+              />
+            </div>
+          </div>
+
+          <div
+            className="quick-filters"
+            aria-label="Quick event filters"
+          >
+            <span>
+              What do you feel like?
+            </span>
+
+            <button
+              className={
+                dateFilter === "tonight"
+                  ? "active"
+                  : ""
+              }
+              onClick={() =>
+                setDateFilter(
+                  dateFilter === "tonight"
+                    ? "any"
+                    : "tonight"
+                )
+              }
+            >
+              Tonight
+            </button>
+
+            <button
+              className={
+                dateFilter === "weekend"
+                  ? "active"
+                  : ""
+              }
+              onClick={() =>
+                setDateFilter(
+                  dateFilter === "weekend"
+                    ? "any"
+                    : "weekend"
+                )
+              }
+            >
+              This weekend
+            </button>
+
+            {[
+              "Music",
+              "Comedy",
+              "Culture",
+              "Sports",
+            ].map((category) => (
+              <button
+                key={category}
+                className={
+                  categoryFilter === category
+                    ? "active"
+                    : ""
+                }
+                onClick={() =>
+                  toggleCategory(category)
+                }
+              >
+                {category}
+              </button>
+            ))}
+
+            {(dateFilter !== "any" ||
+              categoryFilter) && (
+              <button
+                className="reset-filters"
+                onClick={() => {
+                  setDateFilter("any");
+                  setCustomDate("");
+                  setCategoryFilter("");
+                }}
+              >
+                Reset
+              </button>
+            )}
           </div>
 
           <EventList events={events} />

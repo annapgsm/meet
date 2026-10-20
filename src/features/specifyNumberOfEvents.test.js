@@ -1,58 +1,108 @@
-import React from 'react';
-import { render, within, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { defineFeature, loadFeature } from 'jest-cucumber';
+import React from "react";
+import {
+  render,
+  within,
+  waitFor,
+} from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import {
+  defineFeature,
+  loadFeature,
+} from "jest-cucumber";
 
-import App from '../App';
+import App from "../App";
 
-const feature = loadFeature('./src/features/specifyNumberOfEvents.feature');
+const feature = loadFeature(
+  "./src/features/specifyNumberOfEvents.feature"
+);
 
-defineFeature(feature, test => {
+defineFeature(feature, (test) => {
+  test(
+    "32 events are shown by default",
+    ({ given, when, then }) => {
+      let appComponent;
+      let eventListDOM;
 
-  test("When user hasn't specified a number, 32 events are shown by default", ({ given, when, then }) => {
-    let appComponent;
-    let eventListDOM;
+      given(
+        "the user has not changed the result limit",
+        () => {}
+      );
 
-    given("the user has not entered any number of events to display", () => {
-      // No user input for number of events
-    });
+      when("the event list is rendered", () => {
+        appComponent = render(<App />);
 
-    when("the event list is rendered", () => {
-      appComponent = render(<App />);
-      eventListDOM = appComponent.container.querySelector('#event-list');
-    });
-
-    then("the app should show 32 upcoming events by default.", async () => {
-      await waitFor(() => {
-        const eventItems = within(eventListDOM).queryAllByRole('listitem');
-        expect(eventItems.length).toBe(32);
+        eventListDOM =
+          appComponent.container.querySelector(
+            "#event-list"
+          );
       });
-    });
-  });
 
-  test("User can change the number of events displayed", ({ given, when, then }) => {
-    let appComponent;
-    let eventListDOM;
-    let numberOfEventsInput;
+      then(
+        "the app should show 32 upcoming events by default.",
+        async () => {
+          await waitFor(() => {
+            const eventItems = within(
+              eventListDOM
+            ).queryAllByRole("listitem");
 
-    given("the event list has been displayed", () => {
-      appComponent = render(<App />);
-      eventListDOM = appComponent.container.querySelector('#event-list');
-      numberOfEventsInput = appComponent.container.querySelector('#number-of-events input');
-    });
+            expect(eventItems.length).toBe(32);
+          });
+        }
+      );
+    }
+  );
 
-    when("the user specifies a number of events between 1 and all", async () => {
-      const user = userEvent.setup();
-      await user.clear(numberOfEventsInput);
-      await user.type(numberOfEventsInput, '10');
-    });
+  test(
+    "User can change the number of events displayed",
+    ({ given, when, then }) => {
+      let appComponent;
+      let eventListDOM;
+      let numberOfEventsDOM;
 
-    then("the user should receive a list with that specified number of events.", async () => {
-      await waitFor(() => {
-        const eventItems = within(eventListDOM).queryAllByRole('listitem');
-        expect(eventItems.length).toBe(10);
-      });
-    });
-  });
+      given(
+        "the event list has been displayed",
+        () => {
+          appComponent = render(<App />);
 
+          eventListDOM =
+            appComponent.container.querySelector(
+              "#event-list"
+            );
+
+          numberOfEventsDOM =
+            appComponent.container.querySelector(
+              "#number-of-events"
+            );
+        }
+      );
+
+      when(
+        "the user selects 16 events",
+        async () => {
+          const user = userEvent.setup();
+
+          const show16Button = within(
+            numberOfEventsDOM
+          ).getByRole("button", {
+            name: "16",
+          });
+
+          await user.click(show16Button);
+        }
+      );
+
+      then(
+        "the app should show 16 events.",
+        async () => {
+          await waitFor(() => {
+            const eventItems = within(
+              eventListDOM
+            ).queryAllByRole("listitem");
+
+            expect(eventItems.length).toBe(16);
+          });
+        }
+      );
+    }
+  );
 });

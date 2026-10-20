@@ -36,24 +36,51 @@ describe('show/hide an event details', () => {
     expect(hasOpenClass).toBe(false);
   });
 
-  test('User can expand an event to see its details', async () => {
-  await page.waitForSelector('.event');
-  await page.waitForSelector('.event .detail-btn', { visible: true });
+  test("User can expand an event to see its details", async () => {
+    await page.waitForSelector(
+      ".event .detail-btn",
+      {
+        visible: true,
+      }
+    );
 
-  // Click the first event's button
-  await page.click('.event .detail-btn');
+    const detailButton =
+      await page.$(".event .detail-btn");
 
-  // Wait until the first event's details has the "open" class
-  await page.waitForSelector('.event .details.open', { timeout: 60000 });
+    await detailButton.evaluate((element) => {
+      element.scrollIntoView({
+        behavior: "instant",
+        block: "center",
+      });
+    });
 
-  const hasOpenClass = await page.$eval('.event .details', (el) =>
-    el.classList.contains('open')
-  );
+    await detailButton.click();
 
-  expect(hasOpenClass).toBe(true);
-  }, 60000);
+    await page.waitForFunction(
+      () => {
+        const details =
+          document.querySelector(
+            ".event .details"
+          );
 
+        return details?.classList.contains(
+          "open"
+        );
+      },
+      {
+        timeout: 10000,
+      }
+    );
 
+    const hasOpenClass =
+      await page.$eval(
+        ".event .details",
+        (element) =>
+          element.classList.contains("open")
+      );
+
+    expect(hasOpenClass).toBe(true);
+  });
 });
 
 describe('Filter events by city (Feature 1) - E2E tests', () => {
@@ -76,12 +103,12 @@ describe('Filter events by city (Feature 1) - E2E tests', () => {
   test("When user hasn't searched for a city, show upcoming events from all cities", async () => {
     await page.waitForSelector('#event-list li', { timeout: 10000 });
 
-  const eventCount = await page.$$eval(
-    '#event-list li',
-    items => items.length
-  );
+    const eventCount = await page.$$eval(
+      '#event-list li',
+      items => items.length
+    );
 
-  expect(eventCount).toBeGreaterThan(0);
+    expect(eventCount).toBeGreaterThan(0);
   });
 
   test("User should see a list of suggestions when they search for a city", async () => {

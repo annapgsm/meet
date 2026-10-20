@@ -1,44 +1,59 @@
 import React from "react";
 
-function NumberOfEvents({ currentNOE, setCurrentNOE, setErrorAlert }) {
+const options = [16, 32, 64];
 
-  const handleInputChanged = (e) => {
-    const inputValue = e.target.value;
-
-    // Allow empty string input — clear state and error
-    if (inputValue === "") {
-      setCurrentNOE("");
-      setErrorAlert("");
-      return;
-    }
-
-    const value = parseInt(inputValue, 10);
-
-    if (isNaN(value)) {
-      setErrorAlert("Please enter a valid number");
-      return;
-    }
-
-    if (value < 1 || value > 32) {
-      setErrorAlert("Number must be between 1 and 32");
-      return;
-    }
-
-    setErrorAlert("");
-    setCurrentNOE(value);
-  };
-
+function NumberOfEvents({
+  currentNOE,
+  setCurrentNOE,
+  totalEvents,
+}) {
   return (
-    <div id="number-of-events">
-      <input
-        type="number"
-        aria-label="number of events"
-        placeholder="Number of events"
-        value={currentNOE === "" ? "" : currentNOE}
-        onChange={handleInputChanged}
-        min={1}
-        max={32}
-      />
+    <div
+      id="number-of-events"
+      className="result-limit"
+      aria-label="Number of events shown"
+    >
+      <span>Show</span>
+
+      {options.map((option) => (
+        <button
+          key={option}
+          type="button"
+          className={
+            currentNOE === option
+              ? "active"
+              : ""
+          }
+          aria-pressed={
+            currentNOE === option
+          }
+          onClick={() =>
+            setCurrentNOE(option)
+          }
+        >
+          {option}
+        </button>
+      ))}
+
+      <button
+        type="button"
+        className={
+          currentNOE >= totalEvents &&
+          totalEvents > 64
+            ? "active"
+            : ""
+        }
+        aria-pressed={
+          currentNOE >= totalEvents &&
+          totalEvents > 64
+        }
+        disabled={totalEvents <= 64}
+        onClick={() =>
+          setCurrentNOE(totalEvents)
+        }
+      >
+        All
+      </button>
     </div>
   );
 }

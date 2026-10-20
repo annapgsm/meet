@@ -28,6 +28,20 @@ const checkToken = async (accessToken) => {
 export const normalizeEvent = (event) => {
   const venue = event._embedded?.venues?.[0];
 
+  const classification =
+  event.classifications?.[0];
+
+  const segmentName =
+    classification?.segment?.name || "";
+
+  const genreName =
+    classification?.genre?.name || "";
+
+  const categoryName =
+    genreName === "Comedy"
+      ? "Comedy"
+      : segmentName || genreName;
+
   const startDate =
     event.dates?.start?.dateTime ||
     event.dates?.start?.localDate;
@@ -51,6 +65,10 @@ export const normalizeEvent = (event) => {
 
     image: event.images?.[0]?.url || "",
     url: event.url || "",
+    category:
+      categoryName === "Undefined"
+        ? ""
+        : categoryName,
   };
 };
 
