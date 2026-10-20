@@ -3,7 +3,7 @@ import CitySearch from './components/CitySearch';
 import EventList from './components/EventList';
 import NumberOfEvents from './components/NumberOfEvents';
 import CityEventsChart from './components/CityEventsChart';
-import EventGenresChart from './components/EventGenresChart';
+import WhenItsHappening from "./components/WhenItsHappening";
 import ThemeToggle from "./components/ThemeToggle";
 import Icon from "./components/Icon";
 import TimeFilter from "./components/TimeFilter";
@@ -342,22 +342,6 @@ const App = () => {
           </div>
         </section>
 
-        {/*
-        <section
-          className="charts-section"
-          id="insights"
-        >
-          <div className="charts-container">
-            <EventGenresChart events={filteredEvents} />
-
-            <CityEventsChart
-              allLocations={allLocations}
-              events={filteredEvents}
-            />
-          </div>
-        </section>
-        */}
-
         <section
           className="events-section shell"
           id="events"
@@ -527,6 +511,53 @@ const App = () => {
             onToggleSave={toggleSavedEvent}
           />
         </section>
+        
+        {!showMyPlans ? (
+          <section
+            className="city-pulse"
+            id="insights"
+          >
+            <div className="shell">
+              <div className="pulse-heading">
+                <div>
+                  <span className="pulse-eyebrow">
+                    CITY PULSE
+                  </span>
+
+                  <h2>
+                    See what's moving.
+                  </h2>
+                </div>
+
+                <p>
+                  A snapshot of the events
+                  currently in your results.
+                </p>
+              </div>
+
+              <div className="pulse-overview">
+                <strong>
+                  {filteredEvents.length}
+                </strong>
+
+                <span>
+                  events in your current
+                  selection
+                </span>
+              </div>
+
+              <div className="pulse-grid">
+                <CityEventsChart
+                  events={filteredEvents}
+                />
+
+                <WhenItsHappening
+                  events={filteredEvents}
+                />
+              </div>
+            </div>
+          </section>
+        ) : null}
       </main>
     </div>
   );
