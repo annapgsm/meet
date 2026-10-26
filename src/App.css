@@ -281,8 +281,6 @@
 }
 
 .hero-sub {
-  max-width: 570px;
-
   margin: 0 auto;
 
   color: var(--muted);

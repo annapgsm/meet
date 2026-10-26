@@ -1,256 +1,369 @@
+# Meet
 
-# Meet App
+**Meet** is a serverless event-discovery web app built with **React and Vite**. It helps users discover upcoming events across Germany, narrow them down by city, date, and category, save events for later, and explore the current results through lightweight data visualizations.
 
-**Meet App** is a serverless, progressive web application (PWA) built with **React and Vite**, that allows users to discover and explore upcoming events across different cities.
+The app uses the **Ticketmaster Discovery API** through a serverless **AWS Lambda + API Gateway** backend, keeping the Ticketmaster API key out of the client.
 
-The app integrates with the Google Calendar API, supports offline usage, can be installed on desktop and mobile devices and includes data visualizations to help users better understand event distribution.
+**Live app:** https://meet-ten-alpha.vercel.app/
 
+---
 
-## Overview 
+## Overview
 
-Users can search for events by city, control how many events are displayed, view detailed event information, and explore visual insights through charts.
+Meet is designed around a simple question:
 
-The application follows Test-Driven Development (TDD) principles and uses a serverless backend to handle authentication securely.
+> **I want to go out, what is happening near me?**
+
+Users can start with events across Germany or search for a specific city. Results update based on the selected city, date, category, and result limit.
+
+The current version includes:
+
+- live event data from Ticketmaster
+- city autocomplete
+- city-specific event fetching
+- date and category filters
+- expandable event cards
+- saved events with localStorage
+- a **My Plans** view
+- data visualizations in **City Pulse**
+- light and dark themes
+- PWA support
+- unit, integration, BDD, and end-to-end testing
+
+---
 
 ## Tech Stack
-| Category | Technologies |
-|-----------|---------------|
-| **Frontend** | React (Vite + SWC), JavaScript, HTML, CSS |
-| **Testing** | Jest, Cucumber, Puppeteer |
-| **Backend** | AWS Lambda (Serverless Functions) |
-| **API** | Google Calendar API |
-| **Authentication** | OAuth2 |
-| **Data Visualization** | Recharts |
-| **PWA** | Service Workers |
-| **Deployment** | Vercel, GitHub Pages |
-| **Build Tools** | Vite, npm |
 
+| Category | Technologies |
+| --- | --- |
+| **Frontend** | React 18, JavaScript, HTML, CSS |
+| **Build Tool** | Vite + SWC |
+| **Event Data** | Ticketmaster Discovery API |
+| **Serverless Backend** | AWS Lambda, API Gateway, Serverless Framework |
+| **Data Visualization** | Recharts |
+| **State / Persistence** | React state, localStorage |
+| **Testing** | Jest, React Testing Library, jest-cucumber, Puppeteer |
+| **PWA** | vite-plugin-pwa, Workbox |
+| **Deployment** | Vercel |
+
+---
 
 ## Key Features
 
-- Search for events by city with live suggestions
-- View a list of upcoming events
-- Expand and collapse event details
-- Specify the number of events displayed
-- Use the app offline with cached data
-- Install the app as a PWA on desktop or mobile
-- Visualize event data with interactive charts
+### Event discovery
 
-## Bonus Features
-- Open event directly in Google Calendar or add it to a personal calendar
-- Switch between light and dark themes based on preference or environment.
+- Browse upcoming events across Germany
+- Search for a city with live autocomplete suggestions
+- Fetch city-specific event results when a city is selected
+- Filter events by date
+- Filter by categories such as **Music, Comedy, Culture, and Sports**
+- Control how many event cards are displayed
+- Reset the city or category filters independently
 
+### Event cards
 
-## Installation & Setup
+Each event card can include:
 
-Follow these steps to run the app locally:
+- Ticketmaster event image
+- event name
+- date
+- category
+- venue and city
+- expandable event details
+- link to the event on Ticketmaster
+- **Add to Google Calendar** link
 
-### Steps
-1. **Clone the repository**  
-   ```bash
-   git clone https://github.com/annapgsm/meet.git
-   cd meet
-2. **Install dependencies** 
-   ```bash
-   npm install
+The Google Calendar action uses a normal calendar URL and does **not** require Google OAuth or the Google Calendar API.
 
-3. **Start development server**
-  ```bash
-npm start
- ```
- 
-The app should now be accessible at http://localhost:5173/
+### My Plans
 
-4. **Build the app for production**
- ```bash
-   npm run build
+Users can save events they are interested in.
+
+Saved events are stored in `localStorage`, so they remain available after refreshing the browser.
+
+The **My Plans** view gives users a separate place to review their saved events without requiring an account or database.
+
+### City Pulse
+
+The **City Pulse** section turns the currently loaded event data into simple visual insights.
+
+It includes:
+
+- event distribution across the most represented cities
+- an **Other** group for remaining cities
+- event distribution across weekdays
+
+The charts are based on the app's current result set rather than a separate analytics API.
+
+### Theme
+
+Meet includes light and dark themes. The selected theme is persisted in `localStorage`.
+
+---
+
+## Architecture
+
+The frontend does not call Ticketmaster directly.
+
+```text
+React / Vite frontend
+        |
+        v
+AWS API Gateway
+        |
+        v
+AWS Lambda
+        |
+        v
+Ticketmaster Discovery API
 ```
 
+The Lambda function stores the Ticketmaster API key as a server-side environment variable and forwards only the event data to the frontend.
+
+This keeps sensitive API credentials out of the browser.
+
+### Event endpoint
+
+```http
+GET /api/events
+```
+
+Returns upcoming events across Germany.
+
+A city can optionally be supplied:
+
+```http
+GET /api/events?city=Berlin
+```
+
+The backend currently requests up to **100 events per Ticketmaster request**, sorted by date.
+
+When no city is selected, Meet loads Germany-wide results. When a city is selected, the app requests events for that city instead of filtering only the Germany-wide sample in the browser.
+
+---
+
+## Progressive Web App
+
+Meet uses `vite-plugin-pwa` and Workbox to provide PWA functionality.
+
+The app can be installed on supported desktop and mobile browsers and includes a generated service worker.
+
+Static assets and configured image resources can be cached by the service worker.
+
+> **Note:** live Ticketmaster event requests still require a network connection. The current version does not guarantee a complete offline copy of previously loaded event data.
+
+---
+
+## Testing
+
+The project uses several testing approaches.
+
+### Jest + React Testing Library
+
+Used for component, utility, and integration tests.
+
+Examples include:
+
+- rendering the event list
+- city search behavior
+- changing the result limit
+- date filtering
+- category filtering
+- event normalization
+- chart-data helpers
+
+### jest-cucumber
+
+BDD feature tests cover user-facing behavior such as:
+
+- viewing events across cities
+- searching for a city
+- selecting a suggested city
+- changing the number of displayed events
+- expanding and collapsing event details
+
+### Puppeteer
+
+End-to-end tests verify the application in a real browser environment, including city search and event-card interactions.
+
+Run the full test suite with:
+
+```bash
+npm test -- --runInBand --silent
+```
+
+---
+
+## Installation
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/annapgsm/meet.git
+cd meet
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Start the development server
+
+```bash
+npm run dev
+```
+
+Vite will display the local development URL, usually:
+
+```text
+http://localhost:5173/
+```
+
+---
+
+## Production Build
+
+Create an optimized production build with:
+
+```bash
+npm run build
+```
+
+Preview the production build locally with:
+
+```bash
+npm run preview
+```
+
+The production files are generated inside the `dist/` directory.
+
+---
+
+## Serverless Backend
+
+The Ticketmaster integration lives in the `auth-server` directory.
+
+The backend uses:
+
+- AWS Lambda
+- AWS HTTP API / API Gateway
+- Serverless Framework
+- Node.js
+- Ticketmaster Discovery API
+
+The Lambda reads the Ticketmaster API key from an environment variable:
+
+```text
+TICKETMASTER_API_KEY
+```
+
+The key is never sent to the React frontend.
+
+### Deploying your own backend
+
+Create an `auth-server/config.json` file containing your own Ticketmaster API key:
+
+```json
+{
+  "TICKETMASTER_API_KEY": "your-ticketmaster-api-key"
+}
+```
+
+Do not commit this file or your API key to GitHub.
+
+Then deploy the serverless backend from the `auth-server` directory using your configured AWS account and the Serverless Framework.
+
+---
 
 ## Deployment
 
-This app is deployed on Vercel and can be accessed here:
+The frontend is deployed with **Vercel**:
 
 https://meet-ten-alpha.vercel.app/
 
-
-To deploy your own version:
-
-1. Create a [Vercel](https://vercel.com/) account.
-2. Import the project repository into Vercel and follow the prompts to deploy the app.
-3. Your app will be live at the provided Vercel URL.
-
-
-## Test-Driven Development (TDD)
-
-The Meet App was built using strict TDD practices: 
-- Write failing tests
-- Implement minimal code to pass
-- Refactor
-- Repeat
-
-### Testing tools used:
-
-- Jest
-- Cucumber (BDD scenarios)
-- Puppeteer (end-to-end testing)
-
-## Progressive Web App (PWA)
-
-- Offline support via service workers
-- Installable on desktop and mobile
-- Optimized for performance and accessibility
-- Meets Lighthouse PWA standards
-
-## Serverless Backend (AWS Lambda)
-
-The Meet App uses a serverless backend built with AWS Lambda to securely handle authentication with the Google Calendar API.
-
-To protect sensitive credentials and avoid exposing them on the client, authentication is managed via two Lambda functions:
-
-### Lambda Functions
-
-**getAuthURL**
-Generates a Google OAuth authorization URL that allows users to sign in securely.
-
-**getAccessToken**
-Exchanges the authorization code for an access token used to access the Google Calendar API.
-
-### API Endpoints
+A typical deployment flow is:
 
 ```bash
-GET /api/get-auth-url
+npm test -- --runInBand --silent
+npm run build
+git push
 ```
 
-Returns the Google OAuth authorization URL.
+Vercel can then build and deploy the connected repository automatically.
 
-```bash
-GET /api/token/{code} 
+---
+
+## Project Evolution
+
+Meet originally used the **Google Calendar API with OAuth2** as part of its first implementation.
+
+The project was later migrated to **Ticketmaster Discovery API + AWS Lambda/API Gateway** so the application could provide current public event data without requiring users to sign in.
+
+The original Google Calendar/OAuth implementation is preserved in the branch:
+
+```text
+legacy-google-calendar
 ```
-Exchanges the authorization code for an access token.
 
-This architecture ensures:
-
-- Secure handling of OAuth credentials
-- No sensitive data exposed on the frontend
-- Scalable, maintenance-free backend infrastructure
-
-## User Stories
-
-### Feature 1: Filter Events by City
-
-**Scenario 1 – When user hasn’t searched for a city, show upcoming events from all cities**  
-
-As a user, I should be able to see all upcoming events by default so that I can explore what’s happening in all cities without searching first.
-
-* Given user hasn’t searched for any city;  
-* When the user opens the app;  
-* Then the user should see a list of upcoming events.
-
-**Scenario 2 – User should see a list of suggestions when they search for a city**  
-
-As a user, I should be able to see city suggestions so that I can quickly find and select the city I’m interested in.
-
-* Given the main page is open;  
-* When the user starts typing in the city textbox;  
-* Then the user should receive a list of cities (suggestions) that match what they’ve typed.
-
-**Scenario 3 – User can select a city from the suggested list**  
-
-As a user, I should be able to select a city from the suggested list so that I can view events specific to that city.
-
-* Given the user was typing “Berlin” in the city textbox and the list of suggested cities is showing;  
-* When the user selects a city (e.g., “Berlin, Germany”) from the list;  
-* Then their city should be changed to that city and the user should receive a list of upcoming events there.
+The current application does **not** use Google OAuth for event discovery.
 
 ---
 
-### Feature 2: Show/Hide Event Details
+## Main User Flows
 
-**Scenario 1 – An event element is collapsed by default**  
+### Discover events
 
-As a user, I should see event elements collapsed by default so that I can quickly browse a list of events.
+```text
+Open Meet
+- browse Germany-wide events
+- optionally select a city
+- optionally choose a date
+- optionally choose a category
+- browse the results
+```
 
-* Given the event list is displayed;
-* When an event item loads;
-* Then the event details should be hidden by default.
+### Save an event
 
-**Scenario 2 - User can expand an event to see details.**  
+```text
+Find an event
+- save it
+- open My Plans
+- review saved events later
+```
 
-As a user, I should be able to expand an event to see more details so that I can learn additional information about it.
+### Explore event trends
 
-* Given the event list is displayed and events are collapsed;
-* When the user clicks or taps on an event;
-* Then that specific event should expand to show additional information such as description, location, and organizer.
-
-**Scenario 3 - User can collapse an event to hide details**  
-
-As a user, I should be able to collapse an expanded event so that I can return to the clean event list view.
-
-* Given the user has expanded an event;
-* When the user clicks or taps on the expanded event again;
-* Then the event details should hide, returning the event to its collapsed state.
-
----
-
-### Feature 3: Specify Number of Events
-
-**Scenario 1 – When user hasn’t specified a number, 32 events are shown by default**  
-
-As a user, I should see 32 events by default when I haven’t specified a number so that I get a reasonable list of upcoming events.
-
-* Given the user has not entered any number of events to display;
-* When the event list is rendered;
-* Then the app should show 32 upcoming events by default.
-
-**Scenario 2 – User can change the number of events displayed**  
-
-As a user, I should be able to change the number of events displayed so that I can view more or fewer events at once.
-
-* Given the event list has been displayed;  
-* When the user specifies a number of events between 1 and all;  
-* Then the user should receive a list with that specified number of events.
+```text
+Apply filters
+- scroll to City Pulse
+- view city and weekday distribution
+```
 
 ---
 
-### Feature 4: Use the App When Offline
+## What I Practiced
 
-**Scenario 1 – Show cached data when there’s no internet connection**  
+This project gave me hands-on experience with:
 
-As a user, I should be able to use the app and view cached event data when offline so that I can still access previous information.
-
-* Given the device has no internet connection;
-* When the user opens the app;
-* Then the app should display cached event data from the last successful connection.
-
-**Scenario 2 – Show error when user changes search settings (city, number of events)**  
-
-As a user, I should see an error message when I try to change the search settings (city or number of events) while offline so that I understand my request can’t be processed.
-
-* Given the device has no internet connection;
-* When the user attempts to search for a new city or change the number of events;
-* Then the app should show an error message stating that changes cannot be made while offline.
-
----
-
-### Feature 5: Add an App Shortcut to the Home Screen
-
-**Scenario 1 – User can install the meet app as a shortcut on their device home screen**  
-
-As a user, I should be able to install the Meet app as a shortcut on my device’s home screen so that I can easily access it.
-
-* Given the user has installed or opened the web app in a browser;
-* When the app offers an “Add to Home Screen” prompt;
-* Then the user can choose to install the shortcut, adding the Meet app icon to their device’s home screen.
+- building reusable React components
+- managing state and derived UI
+- integrating an external REST API
+- creating a serverless API layer
+- keeping API credentials out of the client
+- normalizing third-party API data
+- client-side filtering
+- localStorage persistence
+- responsive UI development
+- data visualization
+- PWA configuration
+- TDD and BDD workflows
+- integration and browser-based end-to-end testing
+- migrating an existing application to a new API architecture
 
 ---
 
-### Feature 6: Display Charts Visualizing Event Details
+## Repository
 
-**Scenario 1 – Show a chart with the number of upcoming events in each city**  
-
-As a user, I should see a chart displaying the number of upcoming events in each city so that I can quickly understand event distribution.
-
-* Given the user is viewing the dashboard or summary section of the app;
-* When event data is loaded;
-* Then a chart should appear showing the number of upcoming events per city.
+GitHub: https://github.com/annapgsm/meet

@@ -1,6 +1,5 @@
 // src/api.js
 import mockData from "./mock-data";
-import NProgress from "nprogress";
 
 /**
  * @param {*} events:
@@ -17,13 +16,6 @@ export const extractLocations = (events) => {
   return [...new Set(locations)];
 };
 
-const checkToken = async (accessToken) => {
- const response = await fetch(
-   `https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${accessToken}`
- );
- const result = await response.json();
- return result;
-};
 
 export const normalizeEvent = (event) => {
   const venue = event._embedded?.venues?.[0];
@@ -119,113 +111,3 @@ export const getEvents = async (city = "", fetchFn) => {
     .map(normalizeEvent)
     .filter((event) => event.created);
 };
-
-
-/**
- * This function will fetch the list of all events
- */
-/*
-export const getEvents = async () => {
-  NProgress.start();
-
-  // Use mock data for local development
-  if (window.location.href.startsWith("http://localhost")) {
-    NProgress.done();
-    localStorage.setItem("lastEvents", JSON.stringify(mockData));
-    return Array.isArray(mockData) ? mockData : mockData.events || [];
-  }
-
-  // Offline fallback
-  if (!navigator.onLine) {
-    const events = localStorage.getItem("lastEvents");
-    NProgress.done();
-    return events ? JSON.parse(events) : (Array.isArray(mockData) ? mockData : mockData.events || []);
-  }
-
-  try {
-    const token = await getAccessToken();
-
-    if (token) {
-      removeQuery();
-      const url =
-        "https://endpyosejh.execute-api.eu-central-1.amazonaws.com/dev/api/get-events/" + token;
-
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error: ${response.status}`);
-      }
-
-      const result = await response.json();
-      const events = result?.events || [];
-
-      if (events.length > 0) {
-        localStorage.setItem("lastEvents", JSON.stringify(events));
-        NProgress.done();
-        return events;
-      }
-
-      throw new Error("No events returned from API");
-    }
-
-    throw new Error("No access token available");
-  } catch (error) {
-    console.error("Falling back to mock data:", error);
-    const fallbackEvents = Array.isArray(mockData) ? mockData : mockData.events || [];
-    localStorage.setItem("lastEvents", JSON.stringify(fallbackEvents));
-    NProgress.done();
-    return fallbackEvents;
-  }
-};
-*/
-
-export const getAccessToken = async () => {
-    const accessToken = localStorage.getItem('access_token');
-
-    const tokenCheck = accessToken && (await checkToken(accessToken));
-
-
-    if (!accessToken || tokenCheck.error) {         //If no token is found (!accessToken), the code then checks for an authorization code.
-        await localStorage.removeItem("access_token");
-        const searchParams = new URLSearchParams(window.location.search);
-        const code = await searchParams.get("code");
-    if (!code) {
-        const response = await fetch(
-        "https://endpyosejh.execute-api.eu-central-1.amazonaws.com/dev/api/get-auth-url"
-        );
-        const result = await response.json();
-        const { authUrl } = result;
-        return (window.location.href = authUrl);
-    }
-    return code && getToken(code);
-    }
-    return accessToken;
-};
-
-const removeQuery = () => {
-    let newurl;
-    if (window.history.pushState && window.location.pathname) {
-    newurl =
-        window.location.protocol +
-        "//" +
-        window.location.host +
-        window.location.pathname;
-    window.history.pushState("", "", newurl);
-    } else {
-    newurl = window.location.protocol + "//" + window.location.host;
-    window.history.pushState("", "", newurl);
-    }
-};
-
-const getToken = async (code) => {
-    const encodeCode = encodeURIComponent(code);
-    const response = await fetch(
-    'https://endpyosejh.execute-api.eu-central-1.amazonaws.com/dev/api/token' + '/' + encodeCode
-    );
-    const { access_token } = await response.json();
-    access_token && localStorage.setItem("access_token", access_token);
-
-
-    return access_token;
-};
-

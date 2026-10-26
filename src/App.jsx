@@ -19,6 +19,7 @@ import {
   WarningAlert,
 } from "./components/Alert";
 
+
 import "./App.css";
 
 
@@ -179,7 +180,13 @@ const App = () => {
 
   // Hero uses the first displayed event
   const featuredEvent = events[0];
-
+  
+  // Germany gets a fixed hero image.
+  // Selected cities use the first event image.
+  const heroImage =
+  currentCity === "See all cities"
+    ? "/germany-hero.jpg"
+    : featuredEvent?.image;
 
   // Short city name for headings
   const cityLabel =
@@ -395,8 +402,7 @@ const App = () => {
           <p className="hero-sub">
             Concerts, exhibitions,
             comedy and more. Discover
-            what is happening in German
-            cities.
+            what is happening in Germany.
           </p>
 
 
@@ -434,16 +440,14 @@ const App = () => {
           {/* Featured event */}
           <div
             className={`hero-visual ${
-              featuredEvent?.image
+              heroImage
                 ? ""
                 : "hero-placeholder"
             }`}
           >
-            {featuredEvent?.image ? (
+            {heroImage ? (
               <img
-                src={
-                  featuredEvent.image
-                }
+                src={heroImage}
                 alt=""
               />
             ) : null}
