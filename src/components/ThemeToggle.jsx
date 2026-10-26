@@ -1,15 +1,18 @@
 import React from "react";
+import Icon from "./Icon";
 
 function ThemeToggle({ theme, toggleTheme }) {
+  const nextTheme = theme === "light" ? "dark" : "light";
+
   return (
-    <div id="theme-toggle">
-      <button
-        onClick={toggleTheme}
-        aria-label="toggle theme"
-      >
-        {theme === "light" ? "🌙" : "☀️"}
-      </button>
-    </div>
+    <button
+      className="theme-toggle"
+      onClick={toggleTheme}
+      aria-label={`Switch to ${nextTheme} theme`}
+      title={`Switch to ${nextTheme} theme`}
+    >
+      <Icon name={theme === "light" ? "moon" : "sun"} />
+    </button>
   );
 }
 

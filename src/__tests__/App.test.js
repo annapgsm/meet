@@ -51,36 +51,40 @@ describe('<App /> integration', () => {
 
     const allEvents = await getEvents();
     const berlinEvents = allEvents.filter(
-      event => event.location === 'Berlin, Germany'
+      event =>
+        (event.city || event.location) === 'Berlin, Germany'
     );
 
 
     expect(allRenderedEventItems.length).toBe(berlinEvents.length);
   });
 
-  test('changes the number of events displayed when the user changes the number input', async () => {
+  test('changes the number of events displayed when the user selects a result limit', async () => {
     const user = userEvent.setup();
+
     const AppComponent = render(<App />);
     const AppDOM = AppComponent.container.firstChild;
 
-    // Find the NumberOfEvents component container by id or class
-    const NumberOfEventsDOM = AppDOM.querySelector('#number-of-events');
-    // Find the input inside NumberOfEvents
-    const NumberOfEventsInput = within(NumberOfEventsDOM).queryByRole('spinbutton'); 
+    const NumberOfEventsDOM =
+      AppDOM.querySelector('#number-of-events');
 
-    await user.type(NumberOfEventsInput, '{backspace}{backspace}');
+    const show16Button = within(
+      NumberOfEventsDOM
+    ).getByRole('button', {
+      name: '16',
+    });
 
-    /* Clear the default value (e.g. '32') by simulating backspaces, then type '10'
-    await user.type(NumberOfEventsInput, '{backspace}{backspace}10'); */
-    await user.type(NumberOfEventsInput, '10');
+    await user.click(show16Button);
 
-    // Now wait for EventList to update
-    const EventListDOM = AppDOM.querySelector('#event-list');
+    const EventListDOM =
+      AppDOM.querySelector('#event-list');
 
     await waitFor(() => {
-      // Query all list items representing events
-      const eventItems = within(EventListDOM).queryAllByRole('listitem');
-      expect(eventItems.length).toBe(10);
+      const eventItems = within(
+        EventListDOM
+      ).queryAllByRole('listitem');
+
+      expect(eventItems.length).toBe(16);
     });
-  });
+  });  
 });

@@ -1,50 +1,110 @@
-import React, { useState, useEffect } from 'react';
+import React from "react";
+
 import {
-  ScatterChart,
-  Scatter,
-  XAxis, YAxis,
+  Bar,
+  BarChart,
   CartesianGrid,
+  ResponsiveContainer,
   Tooltip,
-  ResponsiveContainer
-} from 'recharts';
+  XAxis,
+  YAxis,
+} from "recharts";
 
-const CityEventsChart = ({allLocations, events}) => {
+import {
+  getCityCounts,
+} from "../utils/chartData";
 
-  const [data, setData] = useState([]);
-
-  useEffect(() => {
-    setData(getData());
-  }, [`${events}`]);
-
-  const getData = () => {
-    const data = allLocations.map((location) => {
-      const count = events.filter ((event) => event.location === location).length
-      const city = location.split((/, | - /))[0]
-      return {city, count};
-    })
-    return data;
-  };
+function CityEventsChart({ events }) {
+  const data =
+    getCityCounts(events);
 
   return (
-    <div className="chart-card">
-      <h2 className="chart-title">Events in Cities</h2>
-      <ResponsiveContainer width="99%" height={300}>
-        <ScatterChart
-          margin={{
-            top: 20,
-            right: 20,
-            bottom: 60,
-            left: 30,
-          }}
-        >
-          <CartesianGrid />
-          <XAxis type="category" dataKey="city" name="City" angle={60} interval={0} tick={{ dx: 20, dy: 40, fontSize: 14 }}/>
-          <YAxis type="number" dataKey="count" name="Number of events" allowDecimals={false}  />
-          <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-          <Scatter name="Events" data={data} fill="#87CBAC" />
-        </ScatterChart>
-      </ResponsiveContainer>
-    </div>
+    <article className="pulse-chart-card">
+      <div className="pulse-chart-heading">
+        <span>WHERE IT'S HAPPENING</span>
+
+        <h3>Top cities</h3>
+
+        <p>
+          Cities with the most events
+          in your current results.
+        </p>
+      </div>
+
+      {data.length > 0 ? (
+        <div className="pulse-chart-visual">
+          <ResponsiveContainer
+            width="100%"
+            height="100%"
+          >
+            <BarChart
+              data={data}
+              layout="vertical"
+              margin={{
+                top: 5,
+                right: 10,
+                bottom: 5,
+                left: 0,
+              }}
+            >
+              <CartesianGrid
+                horizontal={false}
+                stroke="rgba(255,255,255,0.08)"
+              />
+
+              <XAxis
+                type="number"
+                allowDecimals={false}
+                axisLine={false}
+                tickLine={false}
+                tick={{
+                  fill:
+                    "rgba(244,241,233,0.55)",
+                  fontSize: 10,
+                }}
+              />
+
+              <YAxis
+                type="category"
+                dataKey="city"
+                width={75}
+                axisLine={false}
+                tickLine={false}
+                tick={{
+                  fill: "#f4f1e9",
+                  fontSize: 11,
+                }}
+              />
+
+              <Tooltip
+                cursor={{
+                  fill:
+                    "rgba(255,255,255,0.04)",
+                }}
+                contentStyle={{
+                  background: "#f4f1e9",
+                  border: "none",
+                  borderRadius: "4px",
+                  color: "#171714",
+                  fontSize: "12px",
+                }}
+              />
+
+              <Bar
+                dataKey="count"
+                fill="var(--lime)"
+                radius={[0, 4, 4, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      ) : (
+        <p className="pulse-empty">
+          No city data available for
+          this selection.
+        </p>
+      )}
+    </article>
   );
 }
 

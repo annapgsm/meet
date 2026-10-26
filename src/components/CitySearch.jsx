@@ -1,14 +1,49 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
-
-const CitySearch = ({ allLocations, setCurrentCity, setInfoAlert  }) => {
+const CitySearch = ({ allLocations, currentCity, setCurrentCity, setInfoAlert  }) => {
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [query, setQuery] = useState("");
     const [suggestions, setSuggestions] = useState([]);
+    
+    const citySearchRef = useRef(null);
+    
+    // Keep the input in sync when App changes the selected city
+    useEffect(() => {
+    if (currentCity === "See all cities") {
+        setQuery("");
+    } else {
+        setQuery(currentCity);
+    }
+    }, [currentCity]);
+
 
     useEffect(() => {
         setSuggestions(allLocations);
     }, [`${allLocations}`]);
+
+    // Close suggestions when the user clicks outside CitySearch
+    useEffect(() => {
+    const handleClickOutside = (event) => {
+        if (
+        citySearchRef.current &&
+        !citySearchRef.current.contains(event.target)
+        ) {
+        setShowSuggestions(false);
+        }
+    };
+
+    document.addEventListener(
+        "mousedown",
+        handleClickOutside
+    );
+
+    return () => {
+        document.removeEventListener(
+        "mousedown",
+        handleClickOutside
+        );
+    };
+    }, []);
 
     const handleInputChanged = (event) => {
         const value = event.target.value;
@@ -38,7 +73,10 @@ const CitySearch = ({ allLocations, setCurrentCity, setInfoAlert  }) => {
     };
 
     return (
-        <div id="city-search">
+        <div 
+            id="city-search"
+            ref={citySearchRef}
+        >
             <input
                 type="text"
                 className="city"
